@@ -3,7 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon ./bin/www"
+    "start": "nodemon ./bin/www",
+    "migrate": "prisma migrate dev",
+    "pull": "prisma db pull",
+    "push": "prisma db push",
+    "seed": "prisma db seed"
   },
   "dependencies": {
     "@prisma/client": "5.22.0",

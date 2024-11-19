@@ -1,44 +1,33 @@
 import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcrypt'
+
 const prisma = new PrismaClient()
 async function main() {
-  const alice = await prisma.user.upsert({
-    where: { email: 'alice@prisma.io' },
+  const john = await prisma.user.upsert({
+    where: { email: 'john@prisma.io' },
     update: {},
     create: {
-      email: 'alice@prisma.io',
-      name: 'Alice',
-      posts: {
-        create: {
-          title: 'Check out Prisma with Next.js',
-          content: 'https://www.prisma.io/nextjs',
-          published: true,
-        },
-      },
+      email: 'john@prisma.io',
+      username: 'john',
+      password: await bcrypt.hash('john', 10),
+      first_name: 'John',
+      last_name: 'Doe',
+      phone: '123',
     },
   })
-  const bob = await prisma.user.upsert({
-    where: { email: 'bob@prisma.io' },
+  const jane = await prisma.user.upsert({
+    where: { email: 'jane@prisma.io' },
     update: {},
     create: {
-      email: 'bob@prisma.io',
-      name: 'Bob',
-      posts: {
-        create: [
-          {
-            title: 'Follow Prisma on Twitter',
-            content: 'https://twitter.com/prisma',
-            published: true,
-          },
-          {
-            title: 'Follow Nexus on Twitter',
-            content: 'https://twitter.com/nexusgql',
-            published: true,
-          },
-        ],
-      },
+      email: 'jane@prisma.io',
+      username: 'jane',
+      password: await bcrypt.hash('jane', 10),
+      first_name: 'Jane',
+      last_name: 'Doe',
+      phone: '123',
     },
   })
-  console.log({ alice, bob })
+  console.log({ john, jane })
 }
 
 main()

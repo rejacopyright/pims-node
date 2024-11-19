@@ -8,18 +8,27 @@ datasource db {
 }
 
 model User {
-  id      String  @id @default(uuid())
-  email   String  @unique
-  address String?
-  name    String?
-  posts   Post[]
-}
-
-model Post {
-  id        String  @id @default(uuid())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  authorId  String
-  author    User    @relation(fields: [authorId], references: [id])
+  id                  String        @db.Uuid @default(uuid())
+  role_id             Int           @default(1)
+  status_id           Int           @default(1)
+  username            String        @unique
+  password            String?
+  email               String        @unique
+  phone               String
+  first_name          String?
+  last_name           String?
+  avatar              String?       @db.Text
+  nik                 Int?
+  birth               DateTime?
+  gender              Int?
+  marital             Int?
+  relogion_id         Int?
+  occupation_id       String?
+  province_id         Int?
+  city_id             Int?
+  address             String?       @db.Text
+  social              Json?
+  created_at          DateTime      @default(now())
+  updated_at          DateTime      @updatedAt
+  deleted             DateTime?
 }
