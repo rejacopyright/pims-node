@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["omitApi"]
 }
 
 datasource db {
@@ -7,7 +8,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model user {
   id                  String        @db.Uuid @default(uuid())
   role_id             Int           @default(1)
   status_id           Int           @default(1)
