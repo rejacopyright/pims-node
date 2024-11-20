@@ -46,7 +46,7 @@ router.post('/login', async (req, res: any) => {
   if (!isPasswordMatch) {
     return res.status(400).json({ message: "Password doesn't match with your account" })
   }
-  currrentUser = omit(currrentUser, ['password'])
+  currrentUser = omit(currrentUser, ['password', 'deleted'])
   dotenv.config()
   const token = jwt.sign({ user: currrentUser }, process.env.TOKEN_SECRET, { expiresIn: '1h' })
   return res.status(200).json({ token, user: currrentUser })

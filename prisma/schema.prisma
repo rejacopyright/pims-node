@@ -23,7 +23,7 @@ model user {
   birth               DateTime?
   gender              Int?
   marital             Int?
-  relogion_id         Int?
+  religion_id         Int?
   occupation_id       String?
   province_id         Int?
   city_id             Int?

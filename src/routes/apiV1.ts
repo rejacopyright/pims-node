@@ -1,8 +1,9 @@
 import express from 'express'
 const router = express.Router()
 
-router.get('/me', function (req: any, res, next) {
-  res.status(200).json({ message: 'Protected route accessed', userId: req?.userId })
+router.get('/me', (req: any, res: any) => {
+  const { user } = req
+  return res.status(200).json(user)
 })
 
 export default router
