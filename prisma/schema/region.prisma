@@ -1,7 +1,7 @@
 // npx prisma migrate dev --schema=./prisma/schema/user.prisma
 
 model province {
-  id                  Int           @unique
+  id                  Int           @id  @unique
   name                String
   latitude            String
   longitude           String
@@ -10,7 +10,7 @@ model province {
 }
 
 model city {
-  id                  Int           @unique
+  id                  Int           @id  @unique
   province            province      @relation(fields: [province_id], references: [id])
   province_id         Int
   name                String

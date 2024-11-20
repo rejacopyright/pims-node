@@ -1,7 +1,7 @@
 // npx prisma migrate dev --schema=./prisma/schema/user.prisma
 
 model user {
-  id                  String        @db.Uuid @default(uuid())
+  id                  String        @id @default(uuid()) @db.Uuid
   role_id             Int           @default(1)
   status_id           Int           @default(1)
   username            String        @unique
