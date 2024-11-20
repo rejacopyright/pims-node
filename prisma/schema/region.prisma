@@ -6,6 +6,7 @@ model province {
   latitude            String
   longitude           String
   city                city[]
+  user                user[]
 }
 
 model city {
@@ -15,4 +16,5 @@ model city {
   name                String
   latitude            String
   longitude           String
+  user                user[]
 }

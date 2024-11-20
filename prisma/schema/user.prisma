@@ -16,9 +16,13 @@ model user {
   gender              Int?
   marital             Int?
   religion_id         Int?
-  occupation_id       String?
+  religion            religion?     @relation(fields: [religion_id], references: [id])
+  occupation_id       Int?
+  occupation          occupation?   @relation(fields: [occupation_id], references: [id])
   province_id         Int?
+  province            province?     @relation(fields: [province_id], references: [id])
   city_id             Int?
+  city                city?         @relation(fields: [city_id], references: [id])
   address             String?       @db.Text
   social              Json?
   created_at          DateTime      @default(now())

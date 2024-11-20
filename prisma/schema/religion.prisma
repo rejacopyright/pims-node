@@ -3,4 +3,5 @@
 model religion {
   id                  Int        @unique
   name                String
+  user                user[]
 }

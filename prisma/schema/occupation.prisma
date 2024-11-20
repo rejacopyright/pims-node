@@ -3,4 +3,5 @@
 model occupation {
   id                  Int        @unique
   name                String
+  user                user[]
 }
