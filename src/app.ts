@@ -1,16 +1,16 @@
-var createError = require('http-errors')
-var express = require('express')
-var path = require('path')
-var cookieParser = require('cookie-parser')
-var logger = require('morgan')
+import createError from 'http-errors'
+import express from 'express'
+import path from 'path'
+import cookieParser from 'cookie-parser'
+import logger from 'morgan'
 
-var indexRouter = require('./routes/index')
-var usersRouter = require('./routes/users')
-var apiV1 = require('./routes/apiV1')
-var authAPI = require('./routes/authAPI')
-const AuthMiddleWare = require('./middleware/auth')
+import indexRouter from './routes/index'
+import usersRouter from './routes/users'
+import apiV1 from './routes/apiV1'
+import authAPI from './routes/authAPI'
+import AuthMiddleWare from './middleware/auth'
 
-var app = express()
+const app = express()
 
 // view engine setup
 app.set('views', path.join(__dirname, '../views'))
@@ -44,4 +44,4 @@ app.use(function (err, req, res, next) {
   res.render('error')
 })
 
-module.exports = app
+export default app

@@ -1,5 +1,5 @@
-const jwt = require('jsonwebtoken')
-const dotenv = require('dotenv')
+import jwt from 'jsonwebtoken'
+import dotenv from 'dotenv'
 
 function AuthMiddleWare(req, res, next) {
   const token = req.header('Authorization')
@@ -15,4 +15,4 @@ function AuthMiddleWare(req, res, next) {
   }
 }
 
-module.exports = AuthMiddleWare
+export default AuthMiddleWare

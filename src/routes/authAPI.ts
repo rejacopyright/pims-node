@@ -1,10 +1,11 @@
-var { PrismaClient } = require('@prisma/client')
-var express = require('express')
-var router = express.Router()
-const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
-const dotenv = require('dotenv')
-const omit = require('lodash/omit')
+import { PrismaClient } from '@prisma/client'
+import express from 'express'
+import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
+import dotenv from 'dotenv'
+import omit from 'lodash/omit'
+
+const router = express.Router()
 
 const prisma = new PrismaClient({
   omit: {
@@ -17,7 +18,7 @@ const prisma = new PrismaClient({
   },
 })
 
-router.post('/login', async function (req, res, next) {
+router.post('/login', async (req, res: any) => {
   const { username, password } = req?.body
   if (!username) {
     return res.status(400).json({ message: 'Username is rerquired' })
@@ -51,4 +52,4 @@ router.post('/login', async function (req, res, next) {
   return res.status(200).json({ token, user: currrentUser })
 })
 
-module.exports = router
+export default router
