@@ -1,0 +1,11 @@
+// npx prisma generate (if any changes in generator)
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["omitApi", "fullTextSearch", "fullTextIndex", "prismaSchemaFolder"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}

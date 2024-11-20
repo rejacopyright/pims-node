@@ -1,3 +1,5 @@
+// npx ts-node prisma/seeders/user.ts
+
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcrypt'
 
@@ -27,7 +29,6 @@ async function main() {
       phone: '123',
     },
   })
-  console.log({ john, jane })
 }
 
 main()
