@@ -1,0 +1,6 @@
+// npx prisma migrate dev --schema=./prisma/schema/occupation.prisma
+
+model occupation {
+  id                  Int        @unique
+  name                String
+}

@@ -1,8 +1,6 @@
-// npx prisma generate (if any changes in generator)
-
 generator client {
-  provider = "prisma-client-js"
-  previewFeatures = ["omitApi", "fullTextSearch", "fullTextIndex", "prismaSchemaFolder"]
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextIndex", "fullTextSearch", "prismaSchemaFolder", "omitApi"]
 }
 
 datasource db {

@@ -1,0 +1,6 @@
+// npx prisma migrate dev --schema=./prisma/schema/religion.prisma
+
+model religion {
+  id                  Int        @unique
+  name                String
+}
