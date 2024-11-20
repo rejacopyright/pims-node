@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 import express from 'express'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
@@ -95,6 +95,16 @@ router.post('/register', async (req, res: any) => {
     const errors = mapValues(keyByErrors, 'message')
     return res.status(400).json({ status: 'failed', message: errors })
   }
+  // // Send the email
+  // sendMail({
+  //   from: {
+  //     name: 'PIMS CLUB',
+  //     address: 'info@pimsclub.id',
+  //   },
+  //   to: 'rejajamil@gmail.com',
+  //   subject: 'PIMS - Registrasi',
+  //   html: '<h1>1992</h1>',
+  // })
   return res.status(200).json({ status: 'success', message: 'Daftar Berhasil' })
 })
 
