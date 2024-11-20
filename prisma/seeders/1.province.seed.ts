@@ -1,4 +1,4 @@
-// npx ts-node prisma/seeders/province.ts
+// npx ts-node prisma/seeders/1.province.seed.ts
 
 import { PrismaClient } from '@prisma/client'
 

@@ -1,4 +1,4 @@
-// npx ts-node prisma/seeders/user.ts
+// npx ts-node prisma/seeders/100.user.seed.ts
 
 import { PrismaClient } from '@prisma/client'
 import bcrypt from 'bcrypt'
@@ -27,6 +27,10 @@ async function main() {
       first_name: 'Jane',
       last_name: 'Doe',
       phone: '123',
+      occupation_id: 1,
+      religion_id: 1,
+      province_id: 1,
+      city_id: 1,
     },
   })
 }

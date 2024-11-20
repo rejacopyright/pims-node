@@ -23,7 +23,6 @@ router.get('/me', async (req: any, res: any) => {
       city: true,
     },
   })
-  console.log(user?.id, data)
   return res.status(200).json(data)
 })
 
