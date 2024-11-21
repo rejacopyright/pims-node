@@ -81,9 +81,17 @@ router.post('/login', async (req, res: any) => {
 
 router.post('/register', async (req, res: any) => {
   const { username, password, email, phone } = req?.body
-  const anyUser = await prisma.user.findFirst({ where: { OR: [{ username, email }] } })
-  if (anyUser) {
-    return res.status(400).json({ status: 'failed', message: 'Username or email has been taken' })
+  const anyUsername = await prisma.user.findFirst({
+    where: { username: username || '' },
+  })
+  const anyEmail = await prisma.user.findFirst({
+    where: { email: email || '' },
+  })
+  if (anyUsername) {
+    return res.status(400).json({ status: 'failed', message: 'Username has been taken' })
+  }
+  if (anyEmail) {
+    return res.status(400).json({ status: 'failed', message: 'Email has been taken' })
   }
 
   try {
