@@ -1,20 +1,18 @@
-// npx prisma migrate dev --schema=./prisma/schema/user.prisma
-
 model province {
-  id                  Int           @id  @unique
-  name                String
-  latitude            String
-  longitude           String
-  city                city[]
-  user                user[]
+  id        Int    @id @unique
+  name      String
+  latitude  String
+  longitude String
+  city      city[]
+  user      user[]
 }
 
 model city {
-  id                  Int           @id  @unique
-  province            province      @relation(fields: [province_id], references: [id])
-  province_id         Int
-  name                String
-  latitude            String
-  longitude           String
-  user                user[]
+  id          Int      @id @unique
+  province_id Int
+  name        String
+  latitude    String
+  longitude   String
+  province    province @relation(fields: [province_id], references: [id])
+  user        user[]
 }

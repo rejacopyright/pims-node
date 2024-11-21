@@ -1,31 +1,35 @@
-// npx prisma migrate dev --schema=./prisma/schema/user.prisma
-
 model user {
-  id                  String        @id @default(uuid()) @db.Uuid
-  role_id             Int           @default(1)
-  status_id           Int           @default(1)
-  username            String        @unique
-  password            String?
-  email               String        @unique
-  phone               String
-  first_name          String?
-  last_name           String?
-  avatar              String?       @db.Text
-  nik                 Int?
-  birth               DateTime?
-  gender              Int?
-  marital             Int?
-  religion_id         Int?
-  religion            religion?     @relation(fields: [religion_id], references: [id])
-  occupation_id       Int?
-  occupation          occupation?   @relation(fields: [occupation_id], references: [id])
-  province_id         Int?
-  province            province?     @relation(fields: [province_id], references: [id])
-  city_id             Int?
-  city                city?         @relation(fields: [city_id], references: [id])
-  address             String?       @db.Text
-  social              Json?
-  created_at          DateTime      @default(now())
-  updated_at          DateTime      @updatedAt
-  deleted             DateTime?
+  id            String      @id @default(uuid()) @db.Uuid
+  /// 1[Regular] 2[Member] 3[Trainer] 4[Admin] 5[Owner]
+  role_id       Int         @default(1)
+  /// 0[Unconfirmed] 1[Active] 2[Pasive] 3[Inactive]
+  status_id     Int         @default(1)
+  username      String      @unique
+  password      String?
+  email         String      @unique
+  phone         String
+  wallet        Float?      @default(0)
+  first_name    String?
+  last_name     String?
+  avatar        String?
+  nik           Int?
+  birth         DateTime?
+  /// 1[Man] 2[Woman] 3[Other]
+  gender        Int?
+  /// 1[Yes]
+  marital       Int?
+  religion_id   Int?
+  occupation_id Int?
+  province_id   Int?
+  city_id       Int?
+  address       String?
+  social        Json?
+  created_at    DateTime    @default(now())
+  updated_at    DateTime    @updatedAt
+  deleted       DateTime?
+  city          city?       @relation(fields: [city_id], references: [id])
+  occupation    occupation? @relation(fields: [occupation_id], references: [id])
+  province      province?   @relation(fields: [province_id], references: [id])
+  religion      religion?   @relation(fields: [religion_id], references: [id])
+  voucher       voucher[]
 }

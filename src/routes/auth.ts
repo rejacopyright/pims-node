@@ -8,6 +8,7 @@ import keyBy from 'lodash/keyBy'
 import mapValues from 'lodash/mapValues'
 import { z } from 'zod'
 import { sendMail } from '@src/_helper/mail'
+import moment from 'moment'
 
 const router = express.Router()
 
@@ -95,15 +96,30 @@ router.post('/register', async (req, res: any) => {
     return res.status(400).json({ status: 'failed', message: 'Email has been taken' })
   }
 
-  try {
-    await prisma.user.create({
-      data: { username, email, phone, password: await bcrypt.hash(password, 10) },
-    })
-  } catch (err: any) {
-    const keyByErrors = keyBy(err?.errors, 'path.0')
-    const errors = mapValues(keyByErrors, 'message')
-    return res.status(400).json({ status: 'failed', message: errors })
-  }
+  // STORE USER && VOUCHER
+  prisma.$transaction(async () => {
+    try {
+      const user = await prisma.user.create({
+        data: { username, email, phone, password: await bcrypt.hash(password, 10) },
+      })
+      await prisma.voucher.create({
+        data: {
+          user_id: user?.id,
+          code: 'NEWUSER',
+          type: 1,
+          value: 20000,
+          name: 'Pengguna Baru',
+          title: 'Voucher transaksi pertama',
+          expired_at: moment().add(1, 'months').toISOString(),
+        },
+      })
+    } catch (err: any) {
+      const keyByErrors = keyBy(err?.errors, 'path.0')
+      const errors = mapValues(keyByErrors, 'message')
+      return res.status(400).json({ status: 'failed', message: errors })
+    }
+  })
+
   // // Send the email
   res.render('email/register_confirmation', { username, password }, (err, html) => {
     sendMail({

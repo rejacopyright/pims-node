@@ -1,0 +1,23 @@
+model voucher {
+  id          String      @id @default(uuid()) @db.Uuid
+  user_id     String      @db.Uuid
+  /// 1[New User] 2[Referral] 2[???]
+  category    Int         @default(1)
+  code        String?
+  /// 1[cut] 2[percent]
+  type        Int         @default(1)
+  /// 1[auto] 2[claim]
+  method      Int         @default(1)
+  /// 1[Active] 2[Used] 3[Expired]
+  status      Int         @default(1)
+  /// Percent[1-100] Nominal[Infinity]
+  value       Float
+  name        String
+  title       String?
+  badge       String?
+  tnc         String?
+  description String?
+  created_at  DateTime    @default(now())
+  expired_at  DateTime?
+  user        user        @relation(fields: [user_id], references: [id])
+}

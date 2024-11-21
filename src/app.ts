@@ -9,8 +9,8 @@ import cors, { CorsOptions } from 'cors'
 
 import indexRouter from './routes/index'
 import usersRouter from './routes/users'
-import apiV1 from './routes/apiV1'
-import authAPI from './routes/authAPI'
+import accountAPI from './routes/account'
+import authAPI from './routes/auth'
 import AuthMiddleWare from './middleware/auth'
 
 const app = express()
@@ -32,7 +32,7 @@ app.use('/static', express.static(path.join(__dirname, '../public')))
 
 app.use('/', indexRouter)
 app.use('/api/v1/auth', authAPI)
-app.use('/api/v1', AuthMiddleWare, apiV1)
+app.use('/api/v1', AuthMiddleWare, accountAPI)
 app.use('/users', usersRouter)
 
 // catch 404 and forward to error handler
