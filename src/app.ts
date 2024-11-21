@@ -2,6 +2,7 @@ import 'module-alias/register'
 import createError from 'http-errors'
 import express from 'express'
 import path from 'path'
+import { renderFile } from 'ejs'
 import cookieParser from 'cookie-parser'
 import logger from 'morgan'
 import cors, { CorsOptions } from 'cors'
@@ -18,7 +19,8 @@ const app = express()
 
 // view engine setup
 app.set('views', path.join(__dirname, '../views'))
-app.set('view engine', 'jade')
+app.engine('html', renderFile)
+app.set('view engine', 'html')
 
 app.use(logger('dev'))
 app.use(express.json())
