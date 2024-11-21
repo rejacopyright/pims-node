@@ -1,5 +1,7 @@
+import dotenv from 'dotenv'
 import nodemailer, { SendMailOptions } from 'nodemailer'
 
+dotenv.config()
 const { MAIL_HOST, MAIL_PORT, MAIL_USER, MAIL_PASSWORD }: any = process.env
 export const transporter = nodemailer.createTransport({
   host: MAIL_HOST,
@@ -12,5 +14,7 @@ export const transporter = nodemailer.createTransport({
 })
 
 export const sendMail = (mailOptions: SendMailOptions) => {
-  return transporter.sendMail(mailOptions, (error, info) => {})
+  return transporter.sendMail(mailOptions, (error, info) => {
+    console.info({ error, info })
+  })
 }

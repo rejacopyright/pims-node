@@ -7,6 +7,7 @@ import omit from 'lodash/omit'
 import keyBy from 'lodash/keyBy'
 import mapValues from 'lodash/mapValues'
 import { z } from 'zod'
+import { sendMail } from '@src/_helper/mail'
 
 const router = express.Router()
 
@@ -104,15 +105,17 @@ router.post('/register', async (req, res: any) => {
     return res.status(400).json({ status: 'failed', message: errors })
   }
   // // Send the email
-  // sendMail({
-  //   from: {
-  //     name: 'PIMS CLUB',
-  //     address: 'info@pimsclub.id',
-  //   },
-  //   to: 'rejajamil@gmail.com',
-  //   subject: 'PIMS - Registrasi',
-  //   html: '<h1>1992</h1>',
-  // })
+  res.render('email/register_confirmation', { username, password }, (err, html) => {
+    sendMail({
+      from: {
+        name: 'PIMS CLUB',
+        address: 'info@pimsclub.id',
+      },
+      to: email,
+      subject: 'PIMS - Registrasi',
+      html,
+    })
+  })
   return res.status(200).json({ status: 'success', message: 'Daftar Berhasil' })
 })
 
