@@ -1,0 +1,5 @@
+model config {
+  id                       Int    @id @unique
+  voucher_new_user_value   Int    @default(0)
+  voucher_new_user_type    Int    @default(1)
+}

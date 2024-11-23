@@ -88,6 +88,8 @@ router.post('/login', async (req, res: any) => {
 })
 
 router.post('/register', async (req, res: any) => {
+  const config = await prisma.config.findFirst()
+  const { voucher_new_user_type = 1, voucher_new_user_value = 0 }: any = config
   const { username, password, email, phone } = req?.body
   const anyUsername = await prisma.user.findFirst({
     where: { username: username || '' },
@@ -112,8 +114,8 @@ router.post('/register', async (req, res: any) => {
         data: {
           user_id: user?.id,
           code: 'NEWUSER',
-          type: 1,
-          value: 20000,
+          type: voucher_new_user_type,
+          value: voucher_new_user_value,
           name: 'Pengguna Baru',
           title: 'Voucher transaksi pertama',
           expired_at: moment().add(1, 'months').toISOString(),
