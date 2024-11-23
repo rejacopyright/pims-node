@@ -9,8 +9,11 @@ import mapValues from 'lodash/mapValues'
 import { z } from 'zod'
 import { sendMail } from '@src/_helper/mail'
 import moment from 'moment'
+import AuthMiddleWare from '@src/middleware/auth'
 
 const router = express.Router()
+const expiresIn = '6h'
+const refreshExpiresIn = '7d'
 
 export const UserValidator = z.object({
   username: z.string({ required_error: 'Username is required' }).max(100),
@@ -76,9 +79,12 @@ router.post('/login', async (req, res: any) => {
   }
   currrentUser = omit(currrentUser, ['password', 'deleted']) as any
   dotenv.config()
-  const token = jwt.sign({ user: currrentUser }, process.env.TOKEN_SECRET, { expiresIn: '1h' })
+  const token = jwt.sign({ user: currrentUser }, process.env.TOKEN_SECRET, { expiresIn })
+  const refresh_token = jwt.sign({ user: currrentUser }, process.env.TOKEN_SECRET, {
+    expiresIn: refreshExpiresIn,
+  })
   const { exp } = jwt.verify(token, process.env.TOKEN_SECRET)
-  return res.status(200).json({ token, exp, user: currrentUser })
+  return res.status(200).json({ token, refresh_token, exp, user: currrentUser })
 })
 
 router.post('/register', async (req, res: any) => {
@@ -133,6 +139,28 @@ router.post('/register', async (req, res: any) => {
     })
   })
   return res.status(200).json({ status: 'success', message: 'Daftar Berhasil' })
+})
+
+router.post('/token/refresh', AuthMiddleWare, async (req, res: any) => {
+  const bearerToken = req?.headers?.authorization?.split(' ')[1]
+  const decoded = jwt.verify(bearerToken, process.env.TOKEN_SECRET)
+
+  try {
+    let currrentUser = await prisma.user.findFirst({
+      where: { id: decoded?.user?.id },
+    })
+    currrentUser = omit(currrentUser, ['password', 'deleted']) as any
+
+    dotenv.config()
+    const token = jwt.sign({ user: currrentUser }, process.env.TOKEN_SECRET, { expiresIn })
+    const refresh_token = jwt.sign({ user: currrentUser }, process.env.TOKEN_SECRET, {
+      expiresIn: refreshExpiresIn,
+    })
+    const { exp } = jwt.verify(token, process.env.TOKEN_SECRET)
+    return res.status(200).json({ token, refresh_token, exp, user: currrentUser })
+  } catch (error) {
+    res.status(403).json({ message: 'Unauthorize' })
+  }
 })
 
 export default router

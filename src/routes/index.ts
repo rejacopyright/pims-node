@@ -1,24 +1,21 @@
+import { PrismaClient } from '@prisma/client'
+import { paginate } from '@src/_helper/pagination'
 import express from 'express'
+import moment from 'moment'
 const router = express.Router()
 
-/* GET home page. */
+const prisma = new PrismaClient()
+
 router.get('/', async (req, res: any, next) => {
-  // await res.render(
-  //   'email/register_confirmation',
-  //   { username: 'Reja Jamil', password: 'oke' },
-  //   async (err, html) => {
-  //     await sendMail({
-  //       from: {
-  //         name: 'PIMS CLUB',
-  //         address: 'info@pimsclub.id',
-  //       },
-  //       to: 'rejajamil@gmail.com',
-  //       subject: 'PIMS - Registrasi',
-  //       html,
-  //     })
-  //   }
-  // )
   return res.status(200).json({ oke: 'oke' })
+})
+
+router.get('/city', async (req, res: any, next) => {
+  const page = Number(req?.query?.page) || 1
+  const limit = Number(req?.query?.limit) || 10
+  const data = await paginate('city', { page, limit, where: { province_id: 1 } })
+
+  return res.status(200).json({ test: moment().add(1, 'months').toISOString(), data })
 })
 
 export default router

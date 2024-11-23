@@ -1,5 +1,5 @@
 model user {
-  id            String      @id @default(uuid()) @db.Uuid
+  id            String      @id @default(uuid())
   /// 1[Regular] 2[Member] 3[Trainer] 4[Admin] 5[Owner]
   role_id       Int         @default(1)
   /// 0[Unconfirmed] 1[Active] 2[Pasive] 3[Inactive]
@@ -31,5 +31,4 @@ model user {
   occupation    occupation? @relation(fields: [occupation_id], references: [id])
   province      province?   @relation(fields: [province_id], references: [id])
   religion      religion?   @relation(fields: [religion_id], references: [id])
-  voucher       voucher[]
 }

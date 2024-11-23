@@ -1,6 +1,6 @@
 model voucher {
   id          String      @id @default(uuid()) @db.Uuid
-  user_id     String      @db.Uuid
+  user_id     String
   /// 1[New User] 2[Referral] 2[???]
   category    Int         @default(1)
   code        String?
@@ -19,5 +19,4 @@ model voucher {
   description String?
   created_at  DateTime    @default(now())
   expired_at  DateTime?
-  user        user        @relation(fields: [user_id], references: [id])
 }

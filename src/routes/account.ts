@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client'
 import express from 'express'
 import { sendMail } from '@helper/mail'
 import moment from 'moment'
+import { paginate } from '@helper/pagination'
 const router = express.Router()
 
 const prisma = new PrismaClient({
@@ -30,18 +31,21 @@ router.get('/me', async (req: any, res: any) => {
 
 router.get('/voucher', async (req: any, res: any) => {
   const { user } = req
-  const list = await prisma.voucher.findMany({
-    where: {
-      user_id: user?.id || '',
-      status: 1,
-    },
+  const page = Number(req?.query?.page) || 1
+  const limit = Number(req?.query?.limit) || 10
+
+  const list = await paginate('voucher', {
+    page,
+    limit,
+    where: { user_id: user?.id || '', status: 1 },
   })
-  const data = list?.map((item) => {
+  list.data = list?.data?.map((item) => {
     const newItem: any = item
     newItem.exp = moment(item.expired_at).format('YYYY-MM-DD HH:mm')
     return newItem
   })
-  return res.status(200).json(data)
+
+  return res.status(200).json(list)
 })
 
 export default router
