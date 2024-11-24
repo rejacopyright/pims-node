@@ -14,6 +14,7 @@ model transaction_visit {
   app_fee          Float?    @default(0)
   /// MIN FEE
   discount_fee     Float?    @default(0)
+  voucher_id       String?
   /// TOTAL
   total_fee        Float?    @default(0)
   /// TIMING

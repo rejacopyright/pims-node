@@ -9,6 +9,9 @@ model config {
   qr_time_validity       Int     @default(15)
   /// For Select Gym Visit time (in minutes)
   visit_time_interval    Int     @default(30)
+  visit_fee              Float   @default(40000)
+  service_fee            Float   @default(0)
+  app_fee                Float   @default(0)
 }
 
 model config_days {
