@@ -1,0 +1,8 @@
+model service {
+  id          Int  @id @unique
+  /// 1[Active] 2[Used] 3[Expired]
+  name        String
+  label       String?
+  description String?
+  icon        String?
+}

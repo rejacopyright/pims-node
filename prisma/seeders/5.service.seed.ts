@@ -1,14 +1,18 @@
-// npx ts-node prisma/seeders/5.config.seed.ts
+// npx ts-node prisma/seeders/5.service.seed.ts
 
 import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
-const data = [{ id: 1, voucher_new_user_value: 20000, voucher_new_user_type: 1 }]
+const data = [
+  { id: 1, name: 'Gym Visit' },
+  { id: 2, name: 'Kelas Studio' },
+  { id: 3, name: 'Kelas Fungsional' },
+]
 
 async function main() {
   data?.map(async (item) => {
-    await prisma.config.upsert({
+    await prisma.service.upsert({
       where: { id: item?.id },
       update: item,
       create: item,

@@ -1,0 +1,15 @@
+model payment_method {
+  id          String  @id @default(uuid())
+  /// 1[Bank] 2[Wallet] 3[Counter] 4[Other]
+  type        Int     @default(1)
+  name        String  @unique
+  label       String?
+  description String?
+  how_to      String?
+  /// Value in minutes. 24h = 1440m
+  deadline    Int?    @default(1440)
+  icon        String?
+  fee         Float?  @default(0)
+  /// 0[Inactive] 1[Active]
+  status      Int     @default(1)
+}

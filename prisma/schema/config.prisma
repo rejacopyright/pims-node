@@ -1,5 +1,25 @@
 model config {
-  id                       Int    @id @unique
-  voucher_new_user_value   Int    @default(0)
-  voucher_new_user_type    Int    @default(1)
+  id                     Int     @id @unique
+  voucher_new_user_type  Int     @default(1)
+  voucher_new_user_value Int     @default(0)
+  branch_id              String?
+  /// For Select Gym Visit & Class (in days)
+  days_future            Int     @default(30)
+  /// In minutes
+  qr_time_validity       Int     @default(15)
+  /// For Select Gym Visit time (in minutes)
+  visit_time_interval    Int     @default(30)
+}
+
+model config_days {
+  id        Int       @id @unique
+  branch_id String?
+  /// 1[Sunday] 2[Moday] 3[Tuesday] 4[Wednesday] 5[Thrusday] 6[Friday] 7[Saturday]
+  day       Int       @default(1)
+  day_name  String    @default("Sunday")
+  /// Opening & Closing Office (clock) [Null for holiday]
+  open      DateTime? @default(dbgenerated("'00:00:00'::time without time zone")) @db.Time(0)
+  close     DateTime? @default(dbgenerated("'00:00:00'::time without time zone")) @db.Time(0)
+  /// 1[Weekday] 2[Holiday]
+  type      Int       @default(1)
 }
