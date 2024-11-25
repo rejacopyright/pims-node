@@ -1,13 +1,16 @@
-model transaction_visit {
+model transaction_service {
   id               String    @id @default(uuid())
   order_no         String    @unique
   user_id          String
+  /// 1[Regular] 2[Member]
+  user_type        Int       @default(1)
+  member_id        String?
   /// Locattion Branch
   branch_id        String?
   payment_id       String
-  service_id       String
+  service_id       Int
   purchase_expired DateTime
-  purchased_at     DateTime
+  purchased_at     DateTime?
   /// PLUS FEE
   product_fee      Float?    @default(0)
   service_fee      Float?    @default(0)
@@ -21,8 +24,8 @@ model transaction_visit {
   start_date       DateTime
   end_date         DateTime
   /// QR TIME VALIDITY (IF ACTIVE)
-  valid_from       DateTime
-  valid_to         DateTime
+  valid_from       DateTime?
+  valid_to         DateTime?
   /// 1[Unpaid] 2[Active] 3[Done] 4[Cancel]
   status           Int       @default(1)
   cancelled_at     DateTime?

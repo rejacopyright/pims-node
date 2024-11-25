@@ -12,6 +12,7 @@ import usersRouter from './routes/users'
 import accountAPI from './routes/account'
 import authAPI from './routes/auth'
 import globalAPI from './routes/global'
+import transactionAPI from './routes/transaction'
 import AuthMiddleWare from './middleware/auth'
 
 const app = express()
@@ -34,6 +35,7 @@ app.use('/static', express.static(path.join(__dirname, '../public')))
 app.use('/', indexRouter)
 app.use('/api/v1/auth', authAPI)
 app.use('/api/v1/global', globalAPI)
+app.use('/api/v1/transaction', AuthMiddleWare, transactionAPI)
 app.use('/api/v1', AuthMiddleWare, accountAPI)
 app.use('/users', usersRouter)
 
