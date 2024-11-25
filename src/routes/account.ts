@@ -10,6 +10,9 @@ const prisma = new PrismaClient({
     user: {
       password: true,
     },
+    transaction_service: {
+      deleted: true,
+    },
   },
 })
 
@@ -48,6 +51,35 @@ router.get('/voucher', async (req: any, res: any) => {
 
     return res.status(200).json(list)
   } catch (error) {
+    res.status(400).json(error)
+  }
+})
+
+router.get('/my-visit', async (req: any, res: any) => {
+  const { user } = req
+  const page = Number(req?.query?.page) || 1
+  const limit = Number(req?.query?.limit) || 10
+  const date = req?.query?.date
+  const gte = moment(date).utc().toISOString()
+  const lt = moment(date).set({ hours: 0, minutes: 0, seconds: 0 }).add(1, 'd').utc().toISOString()
+
+  try {
+    const list = await prisma.transaction_service.findMany({
+      where: {
+        OR: [{ user_id: user?.id, start_date: date ? { gte, lt } : {} }],
+      },
+    })
+
+    return res.status(200).json(
+      list.map((item) => {
+        const newItem: any = item
+        newItem.start_date = moment(item.start_date).format('YYYY-MM-DD HH:mm')
+        newItem.start_time = moment(item.start_date).format('HH:mm')
+        return newItem
+      })
+    )
+  } catch (error) {
+    console.log(error)
     res.status(400).json(error)
   }
 })
