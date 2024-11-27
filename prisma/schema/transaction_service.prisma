@@ -1,38 +1,40 @@
 model transaction_service {
-  id               String    @id @default(uuid())
-  order_no         String    @unique
-  user_id          String
+  id                  String    @id @default(uuid())
+  order_no            String    @unique
+  user_id             String
   /// 1[Regular] 2[Member]
-  user_type        Int       @default(1)
-  member_id        String?
+  user_type           Int       @default(1)
+  member_id           String?
   /// Locattion Branch
-  branch_id        String?
-  payment_id       String
-  service_id       Int
-  purchase_expired DateTime
-  purchased_at     DateTime?
+  branch_id           String?
+  payment_id          String
+  service_id          Int
+  purchase_expired    DateTime
+  purchased_at        DateTime?
   /// PLUS FEE
-  product_fee      Float?    @default(0)
-  service_fee      Float?    @default(0)
-  app_fee          Float?    @default(0)
+  product_fee         Float?    @default(0)
+  service_fee         Float?    @default(0)
+  app_fee             Float?    @default(0)
   /// MIN FEE
-  discount_fee     Float?    @default(0)
-  voucher_id       String?
+  discount_fee        Float?    @default(0)
+  voucher_id          String?
   /// TOTAL
-  total_fee        Float?    @default(0)
+  total_fee           Float?    @default(0)
   /// TIMING
-  start_date       DateTime
-  end_date         DateTime
+  start_date          DateTime
+  end_date            DateTime
   /// QR TIME VALIDITY (IF ACTIVE)
-  valid_from       DateTime?
-  valid_to         DateTime?
+  valid_from          DateTime?
+  valid_to            DateTime?
   /// 1[Unpaid] 2[Active] 3[Done] 4[Cancel]
-  status           Int       @default(1)
-  canceled_at     DateTime?
+  status              Int       @default(1)
+  /// this.start_date.substract(config.cancel_booking_time, 'minutes') (When Activate/Purchase Order) [IF minutesOf(start_date - now) < cancel_booking_time]
+  cancelable_until    DateTime?
+  canceled_at         DateTime?
   /// 1[System] 2[User] 3[Trainer] 4[Admin]
-  canceled_by     Int?
-  cancel_reason    String?
-  created_at       DateTime  @default(now())
-  updated_at       DateTime  @updatedAt
-  deleted          DateTime?
+  canceled_by         Int?
+  cancel_reason       String?
+  created_at          DateTime  @default(now())
+  updated_at          DateTime  @updatedAt
+  deleted             DateTime?
 }

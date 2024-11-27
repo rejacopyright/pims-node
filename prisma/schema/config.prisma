@@ -7,6 +7,8 @@ model config {
   days_future            Int     @default(30)
   /// In minutes
   qr_time_validity       Int     @default(15)
+  /// Cancel Active Order before transaction_service.start_date (In minutes)
+  cancel_booking_time    Int     @default(15)
   /// For Select Gym Visit time (in minutes)
   visit_time_interval    Int     @default(30)
   visit_fee              Float   @default(40000)
