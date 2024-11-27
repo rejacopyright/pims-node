@@ -37,7 +37,7 @@ router.post('/visit', async (req: any, res: any) => {
     const user_id = data?.id || ''
     const purchase_expired = moment()
       .set({ seconds: 0, milliseconds: 0 })
-      .add({ minutes: payment_method?.deadline || 1440 })
+      .add({ minutes: payment_method?.deadline || 30 })
       .toISOString()
 
     prisma.$transaction(async () => {

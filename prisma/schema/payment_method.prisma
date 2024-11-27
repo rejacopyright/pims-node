@@ -7,7 +7,7 @@ model payment_method {
   description String?
   how_to      String?
   /// Value in minutes. 24h = 1440m
-  deadline    Int?    @default(1440)
+  deadline    Int?    @default(30)
   icon        String?
   fee         Float?  @default(0)
   /// 0[Inactive] 1[Active]

@@ -5,23 +5,23 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 const data = [
-  { type: 1, name: 'bca', label: 'BCA', description: 'Virtual Account', deadline: 1440, fee: 5000 },
-  { type: 1, name: 'bni', label: 'BNI', description: 'Virtual Account', deadline: 1440, fee: 5000 },
+  { type: 1, name: 'bca', label: 'BCA', description: 'Virtual Account', deadline: 30, fee: 5000 },
+  { type: 1, name: 'bni', label: 'BNI', description: 'Virtual Account', deadline: 30, fee: 5000 },
   {
     type: 1,
     name: 'mandiri',
     label: 'Mandiri',
     description: 'Virtual Account',
-    deadline: 1440,
+    deadline: 30,
     fee: 5000,
   },
-  { type: 2, name: 'gopay', label: 'Gopay', description: 'E-Wallet', deadline: 1440, fee: 5000 },
+  { type: 2, name: 'gopay', label: 'Gopay', description: 'E-Wallet', deadline: 30, fee: 5000 },
   {
     type: 2,
     name: 'shopee_pay',
     label: 'Shopee Pay',
     description: 'E-Wallet',
-    deadline: 1440,
+    deadline: 30,
     fee: 5000,
   },
   {
@@ -29,7 +29,7 @@ const data = [
     name: 'alfamaret',
     label: 'Alfamaret',
     description: 'Bayar di Konter',
-    deadline: 1440,
+    deadline: 30,
     fee: 4000,
   },
   {
@@ -37,7 +37,7 @@ const data = [
     name: 'indomaret',
     label: 'Indomaret',
     description: 'Bayar di Konter',
-    deadline: 1440,
+    deadline: 30,
     fee: 4000,
   },
   {
@@ -45,7 +45,7 @@ const data = [
     name: 'qris',
     label: 'QRIS',
     description: 'Bayar Menggunakan QRIS',
-    deadline: 1440,
+    deadline: 30,
     fee: 3000,
   },
   {
@@ -53,7 +53,7 @@ const data = [
     name: 'cod',
     label: 'COD',
     description: 'Bayar di Tempat',
-    deadline: 1440,
+    deadline: 30,
     fee: 0,
   },
 ]

@@ -66,7 +66,7 @@ router.get('/my-visit', async (req: any, res: any) => {
   try {
     const list = await prisma.transaction_service.findMany({
       where: {
-        OR: [{ user_id: user?.id, start_date: date ? { gte, lt } : {} }],
+        OR: [{ user_id: user?.id, status: { in: [1, 2] }, start_date: date ? { gte, lt } : {} }],
       },
     })
 

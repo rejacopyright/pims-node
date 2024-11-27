@@ -28,9 +28,9 @@ model transaction_service {
   valid_to         DateTime?
   /// 1[Unpaid] 2[Active] 3[Done] 4[Cancel]
   status           Int       @default(1)
-  cancelled_at     DateTime?
+  canceled_at     DateTime?
   /// 1[System] 2[User] 3[Trainer] 4[Admin]
-  cancelled_by     Int?
+  canceled_by     Int?
   cancel_reason    String?
   created_at       DateTime  @default(now())
   updated_at       DateTime  @updatedAt
