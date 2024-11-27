@@ -3,6 +3,9 @@ import express from 'express'
 import moment from 'moment'
 import { Encriptor } from '@src/_helper/encryptor'
 import { paginate } from '@src/_helper/pagination'
+import keyBy from 'lodash/keyBy'
+import mapValues from 'lodash/mapValues'
+import { z } from 'zod'
 const router = express.Router()
 
 const prisma = new PrismaClient({
@@ -11,6 +14,13 @@ const prisma = new PrismaClient({
       password: true,
     },
   },
+})
+
+export const CancelOrderValidator = z.object({
+  status: z.number(),
+  canceled_at: z.string(),
+  canceled_by: z.number({ required_error: 'Canceler is required' }),
+  cancel_reason: z.string({ required_error: 'Alasan pembatalan wajib diisi' }).max(200),
 })
 
 router.get('/:status(unpaid|active|done|cancel)', async (req: any, res: any) => {
@@ -51,6 +61,27 @@ router.get('/:id/detail', async (req: any, res: any) => {
     return res.status(200).json(data)
   } catch (err: any) {
     return res.status(400).json({ status: 'failed', message: err })
+  }
+})
+
+router.post('/:id/cancel', async (req: any, res: any) => {
+  try {
+    const { id } = req?.params
+    const { canceled_by, cancel_reason } = req?.body
+    const data = await prisma.transaction_service.update({
+      where: { id: id },
+      data: CancelOrderValidator.partial().parse({
+        status: 4,
+        canceled_at: moment().toISOString(),
+        canceled_by: canceled_by,
+        cancel_reason: cancel_reason,
+      }),
+    })
+    return res.status(200).json({ status: 'success', message: 'Order berhasil dibatalkan', data })
+  } catch (err: any) {
+    const keyByErrors = keyBy(err?.errors, 'path.0')
+    const errors = mapValues(keyByErrors, 'message')
+    return res.status(400).json({ status: 'failed', message: errors })
   }
 })
 

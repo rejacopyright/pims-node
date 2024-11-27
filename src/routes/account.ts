@@ -79,7 +79,6 @@ router.get('/my-visit', async (req: any, res: any) => {
       })
     )
   } catch (error) {
-    console.log(error)
     res.status(400).json(error)
   }
 })
