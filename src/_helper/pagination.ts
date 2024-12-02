@@ -23,12 +23,17 @@ export const paginate = async (model: modelType, options: PaginateTypes) => {
     query: {
       $allModels: {
         findMany({ args, query }) {
-          return query({ ...args, skip: currentCount, take: limit })
+          return query({
+            ...args,
+            skip: currentCount,
+            take: limit,
+            include: options?.include || {},
+          })
         },
       },
     },
   })
-  const originalOptions = { ...omit(options, ['page', 'limit']) }
+  const originalOptions = { ...omit(options, ['page', 'limit', 'include']) }
   const total = await db[model.toString()].count(originalOptions)
   const { page, limit } = options
   const last_page = Math.ceil(total / limit)

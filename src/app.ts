@@ -8,12 +8,13 @@ import logger from 'morgan'
 import cors, { CorsOptions } from 'cors'
 
 import indexRouter from './routes/index'
-import usersRouter from './routes/users'
+import usersAPI from './routes/users'
 import accountAPI from './routes/account'
 import authAPI from './routes/auth'
 import globalAPI from './routes/global'
 import transactionAPI from './routes/transaction'
 import orderAPI from './routes/order'
+import classAPI from './routes/class'
 import AuthMiddleWare from './middleware/auth'
 
 const app = express()
@@ -26,8 +27,8 @@ app.engine('html', renderFile)
 app.set('view engine', 'html')
 
 app.use(logger('dev'))
-app.use(express.json())
-app.use(express.urlencoded({ extended: false }))
+app.use(express.json({ limit: '50mb' }))
+app.use(express.urlencoded({ limit: '50mb', extended: false }))
 app.use(cookieParser())
 app.use(cors())
 
@@ -38,7 +39,8 @@ app.use('/api/v1/auth', authAPI)
 app.use('/api/v1/global', globalAPI)
 app.use('/api/v1/transaction', AuthMiddleWare, transactionAPI)
 app.use('/api/v1/order', AuthMiddleWare, orderAPI)
-app.use('/api/v1/users', AuthMiddleWare, usersRouter)
+app.use('/api/v1/users', AuthMiddleWare, usersAPI)
+app.use('/api/v1/class', AuthMiddleWare, classAPI)
 app.use('/api/v1', AuthMiddleWare, accountAPI)
 
 // catch 404 and forward to error handler

@@ -13,7 +13,7 @@ const prisma = new PrismaClient({
 })
 
 router.get('/trainer', async (req: any, res: any) => {
-  const q = Number(req?.query?.q) || 1
+  const q = req?.query?.q || ''
   const page = Number(req?.query?.page) || 1
   const limit = Number(req?.query?.limit) || 10
 
@@ -22,12 +22,12 @@ router.get('/trainer', async (req: any, res: any) => {
       page,
       limit,
       where: {
+        AND: [{ role_id: 3, status: 1 }],
         OR: [
-          { role_id: 3, status: 1 },
           {
-            first_name: { contains: q?.toString() },
-            last_name: { contains: q?.toString() },
-            email: { contains: q?.toString() },
+            first_name: { contains: q?.toString(), mode: 'insensitive' },
+            last_name: { contains: q?.toString(), mode: 'insensitive' },
+            email: { contains: q?.toString(), mode: 'insensitive' },
           },
         ],
       },
