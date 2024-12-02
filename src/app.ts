@@ -38,8 +38,8 @@ app.use('/api/v1/auth', authAPI)
 app.use('/api/v1/global', globalAPI)
 app.use('/api/v1/transaction', AuthMiddleWare, transactionAPI)
 app.use('/api/v1/order', AuthMiddleWare, orderAPI)
+app.use('/api/v1/users', AuthMiddleWare, usersRouter)
 app.use('/api/v1', AuthMiddleWare, accountAPI)
-app.use('/users', usersRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
