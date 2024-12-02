@@ -3,7 +3,7 @@ model user {
   /// 1[Regular] 2[Member] 3[Trainer] 4[Admin] 5[Owner]
   role_id       Int         @default(1)
   /// 0[Unconfirmed] 1[Active] 2[Pasive] 3[Inactive]
-  status_id     Int         @default(1)
+  status        Int         @default(1)
   username      String      @unique
   password      String?
   email         String      @unique
@@ -28,7 +28,7 @@ model user {
   updated_at    DateTime    @updatedAt
   deleted       DateTime?
   city          city?       @relation(fields: [city_id], references: [id])
-  occupation    occupation? @relation(fields: [occupation_id], references: [id])
+  occupation    occupation? @relation(fields: [occupation_id], references: [id], onDelete: SetNull)
   province      province?   @relation(fields: [province_id], references: [id])
   religion      religion?   @relation(fields: [religion_id], references: [id])
 }

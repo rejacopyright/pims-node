@@ -1,0 +1,13 @@
+model class_schedule {
+  id                   String         @id @default(uuid())
+  class_id             String?
+  trainer_id           String?
+  /// 0[Inactive] 1[Active]
+  status               Int            @default(1)
+  fee                  Float?         @default(0)
+  quota                Int?           @default(10)
+  start_date           DateTime?
+  end_date             DateTime?
+
+  class                class_store?   @relation(fields: [class_id], references: [id], onDelete: SetNull)
+}

@@ -71,7 +71,7 @@ router.post('/login', async (req, res: any) => {
     // omit: { password: true },
   })
   if (!currrentUser) {
-    return res.status(400).json({ message: 'Account is not registered' })
+    return res.status(400).json({ code: 'no_account', message: 'Account is not registered' })
   }
   const isPasswordMatch = await bcrypt.compare(password, currrentUser?.password || '')
   if (!isPasswordMatch) {

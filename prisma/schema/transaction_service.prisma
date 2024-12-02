@@ -1,7 +1,7 @@
 model transaction_service {
   id                  String    @id @default(uuid())
   order_no            String    @unique
-  user_id             String
+  user_id             String?
   /// 1[Regular] 2[Member]
   user_type           Int       @default(1)
   member_id           String?

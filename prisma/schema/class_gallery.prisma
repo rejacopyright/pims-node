@@ -1,0 +1,12 @@
+model class_gallery {
+  id            String         @id @default(uuid())
+  class_id      String
+  index         Int?           @default(1)
+  filename      String
+  /// 1[Image] 1[Video]
+  type          Int            @default(1)
+  /// for alt or alias or title
+  name          String?        @default("Image")
+
+  class_store   class_store?   @relation(fields: [class_id], references: [id], onDelete: Cascade)
+}
