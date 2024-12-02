@@ -213,4 +213,39 @@ router.put('/:id/update', async (req: any, res: any) => {
   }
 })
 
+// Delete Class
+router.delete('/:id/delete', async (req: any, res: any) => {
+  const { id } = req?.params
+
+  try {
+    const dir = 'public/images/class'
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir)
+    }
+    const thisClass = await prisma.class_store.findUnique({
+      where: { id },
+      include: { class_gallery: true },
+    })
+    const class_gallery = thisClass?.class_gallery
+    if (class_gallery && class_gallery?.length > 0) {
+      class_gallery?.map((item) => {
+        const dir = 'public/images/class'
+        const filename = `${dir}/${item?.filename}`
+        if (fs.existsSync(filename)) {
+          fs.unlink(filename, () => '')
+        }
+      })
+      await prisma.class_gallery.deleteMany({
+        where: { id: { in: class_gallery?.map((item) => item?.id) } },
+      })
+    }
+    const data = await prisma.class_store.delete({ where: { id } })
+    return res.status(200).json({ status: 'success', message: 'Kelas berhasil dihapus', data })
+  } catch (err: any) {
+    const keyByErrors = keyBy(err?.errors, 'path.0')
+    const errors = mapValues(keyByErrors, 'message')
+    return res.status(400).json({ status: 'failed', message: errors })
+  }
+})
+
 export default router
