@@ -8,7 +8,7 @@ module.exports = {
       watch_delay: 1000,
       ignore_watch: ['node_modules', '\\.git', '*.log'],
       instances: 1, // Or a number of instances
-      script: 'ts-node',
+      script: 'node_modules/ts-node/dist/bin.js',
       args: './src/bin/www.ts',
       env_local: {
         APP_ENV: 'local', // APP_ENV=local
