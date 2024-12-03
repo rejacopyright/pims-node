@@ -7,7 +7,7 @@ const router = express.Router()
 const prisma = new PrismaClient()
 
 router.get('/', async (req, res: any, next) => {
-  return res.status(200).json({ oke: 'okelah3' })
+  return res.status(200).json({ oke: 'okelah4' })
 })
 
 router.get('/city', async (req, res: any, next) => {
