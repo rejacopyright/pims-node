@@ -3,7 +3,7 @@ import express from 'express'
 import moment from 'moment'
 import fs from 'fs'
 import { Encriptor } from '@src/_helper/encryptor'
-import { paginate } from '@src/_helper/pagination'
+import { paginate, prismaX } from '@src/_helper/pagination'
 import keyBy from 'lodash/keyBy'
 import mapValues from 'lodash/mapValues'
 import { z } from 'zod'
@@ -91,7 +91,7 @@ router.get('/:service(studio|functional)', async (req: any, res: any) => {
     const limit = Number(req?.query?.limit) || 10
     const { service } = req?.params
     const serviceObj = { studio: 2, functional: 3 }
-    const data = await paginate('class_store', {
+    const data = await prismaX.class_store.paginate({
       page,
       limit,
       where: {

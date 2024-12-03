@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client'
 import express from 'express'
 import moment from 'moment'
 import { Encriptor } from '@src/_helper/encryptor'
-import { paginate } from '@src/_helper/pagination'
+import { paginate, prismaX } from '@src/_helper/pagination'
 import keyBy from 'lodash/keyBy'
 import mapValues from 'lodash/mapValues'
 import { z } from 'zod'
@@ -39,7 +39,7 @@ router.get('/:status(unpaid|active|done|cancel)', async (req: any, res: any) => 
         cancel_reason: 'Gymers tidak membayar booking melebihi batas akhir pembayaran',
       },
     })
-    const data = await paginate('transaction_service', {
+    const data = await prismaX.transaction_service.paginate({
       page,
       limit,
       where: { user_id: user?.id, status: statusObj[status] },

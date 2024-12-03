@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import express from 'express'
 import omit from 'lodash/omit'
-import { paginate } from '@helper/pagination'
+import { paginate, prismaX } from '@helper/pagination'
 const router = express.Router()
 
 const prisma = new PrismaClient({
@@ -18,7 +18,7 @@ router.get('/trainer', async (req: any, res: any) => {
   const limit = Number(req?.query?.limit) || 10
 
   try {
-    const list = await paginate('user', {
+    const list = await prismaX.user.paginate({
       page,
       limit,
       where: {

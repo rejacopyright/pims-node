@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client'
 import express from 'express'
 import { sendMail } from '@helper/mail'
 import moment from 'moment'
-import { paginate } from '@helper/pagination'
+import { paginate, prismaX } from '@helper/pagination'
 const router = express.Router()
 
 const prisma = new PrismaClient({
@@ -14,6 +14,17 @@ const prisma = new PrismaClient({
       deleted: true,
     },
   },
+})
+
+router.get('/test', async (req: any, res: any) => {
+  const { user } = req
+  const data = await prismaX.user.paginate({
+    page: 2,
+    limit: 3,
+    where: { first_name: { contains: '3' } },
+    include: { religion: true },
+  })
+  return res.status(200).json(data)
 })
 
 router.get('/me', async (req: any, res: any) => {
@@ -38,7 +49,7 @@ router.get('/voucher', async (req: any, res: any) => {
   const limit = Number(req?.query?.limit) || 10
 
   try {
-    const list = await paginate('voucher', {
+    const list = await prismaX.voucher.paginate({
       page,
       limit,
       where: { user_id: user?.id, status: 1 },
