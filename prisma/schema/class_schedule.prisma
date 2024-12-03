@@ -1,5 +1,6 @@
 model class_schedule {
   id                   String         @id @default(uuid())
+  service_id           Int            @default(2)
   class_id             String?
   trainer_id           String?
   /// 0[Inactive] 1[Active]
