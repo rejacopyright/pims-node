@@ -72,7 +72,7 @@ router.get('/:service(studio|functional)', async (req: any, res: any) => {
       .toISOString()
     const data = await prisma.class_schedule.findMany({
       where: { service_id: serviceObj[service], start_date: { gte, lt } },
-      include: { class: true },
+      include: { class: { include: { class_gallery: true } } },
       orderBy: { start_date: 'desc' },
     })
     const mappedData = await Promise.all(
@@ -98,8 +98,19 @@ router.get('/:service(studio|functional)', async (req: any, res: any) => {
 router.get('/:id/detail', async (req: any, res: any) => {
   try {
     const { id } = req?.params
-    const data = await prisma.class_schedule.findUnique({ where: { id: id } })
-    return res.status(200).json(data)
+    const data = await prisma.class_schedule.findUnique({
+      where: { id: id },
+      include: { class: { include: { class_gallery: true } } },
+    })
+    const mappedData: any = data
+    if (data?.trainer_id) {
+      const trainer = await prisma.user.findUnique({ where: { id: data?.trainer_id } })
+      mappedData.trainer = trainer
+      if (trainer?.id) {
+        mappedData.trainer.full_name = `${trainer?.first_name} ${trainer?.last_name}`
+      }
+    }
+    return res.status(200).json(mappedData)
   } catch (err: any) {
     return res.status(400).json({ status: 'failed', message: err })
   }
