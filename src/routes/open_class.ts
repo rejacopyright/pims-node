@@ -64,11 +64,15 @@ router.get('/:service(studio|functional)', async (req: any, res: any) => {
     const { service } = req?.params
     const serviceObj = { studio: 2, functional: 3 }
     const date = req?.query?.date
-    const gte = moment(date).utc().toISOString()
+    const gte = moment(date)
+      .local()
+      // .utc()
+      .toISOString()
     const lt = moment(date)
       .set({ hours: 0, minutes: 0, seconds: 0 })
       .add(1, 'd')
-      .utc()
+      .local()
+      // .utc()
       .toISOString()
     const data = await prisma.class_schedule.findMany({
       where: { service_id: serviceObj[service], start_date: { gte, lt } },
