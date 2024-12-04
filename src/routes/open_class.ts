@@ -88,7 +88,7 @@ router.get('/:service(studio|functional)', async (req: any, res: any) => {
         return newItem
       })
     )
-    return res.status(200).json(mappedData)
+    return res.status(200).json({ data: mappedData })
   } catch (err: any) {
     return res.status(400).json({ status: 'failed', message: err })
   }
