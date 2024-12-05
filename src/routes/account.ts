@@ -71,8 +71,8 @@ router.get('/my-visit', async (req: any, res: any) => {
   const page = Number(req?.query?.page) || 1
   const limit = Number(req?.query?.limit) || 10
   const date = req?.query?.date
-  const gte = moment(date).utc().toISOString()
-  const lt = moment(date).set({ hours: 0, minutes: 0, seconds: 0 }).add(1, 'd').utc().toISOString()
+  const gte = moment(date).toISOString()
+  const lt = moment(date).set({ hours: 0, minutes: 0, seconds: 0 }).add(1, 'd').toISOString()
 
   try {
     const list = await prisma.transaction_service.findMany({
