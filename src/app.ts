@@ -1,4 +1,5 @@
 import 'module-alias/register'
+import 'moment/locale/es'
 import createError from 'http-errors'
 import express from 'express'
 import path from 'path'
