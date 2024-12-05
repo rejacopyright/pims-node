@@ -45,6 +45,30 @@ router.get('/:status(unpaid|active|done|cancel)', async (req: any, res: any) => 
       where: { user_id: user?.id, status: statusObj[status] },
       orderBy: { updated_at: 'desc' },
     })
+    try {
+      const mappedData = await Promise.all(
+        data?.data?.map(async (item) => {
+          const newItem = item
+          if (item?.class_schedule_id) {
+            newItem.class_schedule = await prisma.class_schedule.findUnique({
+              where: { id: item?.class_schedule_id },
+              include: { class: { include: { class_gallery: true } } },
+            })
+            const trainer = await prisma.user.findUnique({
+              where: { id: newItem?.class_schedule?.trainer_id },
+            })
+            newItem.class_schedule.trainer = trainer
+            if (trainer?.id) {
+              newItem.class_schedule.trainer.full_name = `${trainer?.first_name} ${trainer?.last_name}`
+            }
+          }
+          return newItem
+        })
+      )
+      data.data = mappedData
+    } catch (error) {
+      //
+    }
     return res.status(200).json(data)
   } catch (err: any) {
     return res.status(400).json({ status: 'failed', message: err })
@@ -58,7 +82,23 @@ router.get('/:id/detail', async (req: any, res: any) => {
     const data = await prisma.transaction_service.findUnique({
       where: { id: id },
     })
-    return res.status(200).json(data)
+    const newData: any = data
+    if (data?.class_schedule_id) {
+      newData.class_schedule = await prisma.class_schedule.findUnique({
+        where: { id: data?.class_schedule_id },
+        include: { class: { include: { class_gallery: true } } },
+      })
+      if (newData?.class_schedule?.trainer_id) {
+        const trainer = await prisma.user.findUnique({
+          where: { id: newData?.class_schedule?.trainer_id },
+        })
+        newData.class_schedule.trainer = trainer
+        if (trainer?.id) {
+          newData.class_schedule.trainer.full_name = `${trainer?.first_name} ${trainer?.last_name}`
+        }
+      }
+    }
+    return res.status(200).json(newData)
   } catch (err: any) {
     return res.status(400).json({ status: 'failed', message: err })
   }
