@@ -96,7 +96,13 @@ router.get('/:service(studio|functional)', async (req: any, res: any) => {
         return newItem
       })
     )
-    return res.status(200).json({ gte, lt, data: mappedData })
+    return res.status(200).json({
+      gte,
+      lt,
+      isUTC: moment(date).isUTC(),
+      isLocal: moment(date).isLocal(),
+      data: mappedData,
+    })
   } catch (err: any) {
     return res.status(400).json({ status: 'failed', message: err })
   }
