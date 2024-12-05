@@ -99,7 +99,9 @@ router.get('/:service(studio|functional)', async (req: any, res: any) => {
     return res.status(200).json({
       gte,
       lt,
+      isDST: moment(date).isDST(),
       isUTC: moment(date).isUTC(),
+      utcOffset: moment(date).utcOffset(),
       isLocal: moment(date).isLocal(),
       data: mappedData,
     })
