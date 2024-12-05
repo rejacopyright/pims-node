@@ -65,17 +65,21 @@ router.get('/:service(studio|functional)', async (req: any, res: any) => {
     const serviceObj = { studio: 2, functional: 3 }
     const date = req?.query?.date
     const gte = moment(date)
-      .local()
+      // .local()
       // .utc()
       .toISOString()
-    const lt = moment(date)
-      .set({ hours: 0, minutes: 0, seconds: 0 })
+    const lt = moment(gte)
+      // .set({ hours: 0, minutes: 0, seconds: 0 })
       .add(1, 'd')
-      .local()
+      // .local()
       // .utc()
       .toISOString()
     const data = await prisma.class_schedule.findMany({
-      where: { service_id: serviceObj[service], start_date: { gte, lt } },
+      // where: { service_id: serviceObj[service], start_date: { gte, lt } },
+      where: {
+        AND: [{ service_id: serviceObj[service] }, { start_date: { gte } }, { start_date: { lt } }],
+        // OR: [{ start_date: { gte } }, { start_date: { lt } }],
+      },
       include: { class: { include: { class_gallery: true } } },
       orderBy: { start_date: 'desc' },
     })
@@ -92,7 +96,7 @@ router.get('/:service(studio|functional)', async (req: any, res: any) => {
         return newItem
       })
     )
-    return res.status(200).json({ data: mappedData })
+    return res.status(200).json({ gte, lt, data: mappedData })
   } catch (err: any) {
     return res.status(400).json({ status: 'failed', message: err })
   }
