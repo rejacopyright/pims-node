@@ -20,13 +20,14 @@ export const CreateClassValidator = z.object({
   trainer_id: z.string({ required_error: 'Trainer is required' }),
   fee: z.number(),
   quota: z.number().nullish(),
+  session: z.number(),
   start_date: z.string(),
   end_date: z.string(),
 })
 
 // Create Class
 router.post('/create', async (req: any, res: any) => {
-  const { service_id, class_id, trainer_id, fee, quota, start_date, end_date } = req?.body
+  const { service_id, class_id, trainer_id, fee, quota, start_date, end_date, session } = req?.body
 
   try {
     const isExist = await prisma.class_schedule.findFirst({ where: { start_date } })
@@ -40,6 +41,7 @@ router.post('/create', async (req: any, res: any) => {
         trainer_id,
         fee: parseInt(fee || 0),
         quota: parseInt(quota || 0),
+        session: parseInt(session || 1),
         start_date,
         end_date,
       }),
@@ -125,7 +127,7 @@ router.get('/:id/detail', async (req: any, res: any) => {
 
 // Update Class
 router.put('/:id/update', async (req: any, res: any) => {
-  const { class_id, trainer_id, fee, quota } = req?.body
+  const { class_id, trainer_id, fee, quota, session } = req?.body
   const { id } = req?.params
 
   try {
@@ -136,6 +138,7 @@ router.put('/:id/update', async (req: any, res: any) => {
         trainer_id,
         fee: parseInt(fee || 0),
         quota: parseInt(quota || 0),
+        session: parseInt(session || 1),
       }),
     })
 
