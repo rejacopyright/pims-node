@@ -1,8 +1,8 @@
 import { PrismaClient } from '@prisma/client'
 import express from 'express'
 import { sendMail } from '@helper/mail'
-import moment from 'moment'
 import { paginate, prismaX } from '@helper/pagination'
+import moment from 'moment-timezone'
 const router = express.Router()
 
 const prisma = new PrismaClient({

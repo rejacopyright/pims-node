@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import express from 'express'
-import moment from 'moment'
+import moment from 'moment-timezone'
 import { Encriptor } from '@src/_helper/encryptor'
 import { paginate, prismaX } from '@src/_helper/pagination'
 import keyBy from 'lodash/keyBy'

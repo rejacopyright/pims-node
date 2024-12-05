@@ -3,6 +3,7 @@ model class_schedule {
   service_id           Int            @default(2)
   class_id             String?
   trainer_id           String?
+  session              Int            @default(1)
   /// 0[Inactive] 1[Active]
   status               Int            @default(1)
   fee                  Float?         @default(0)

@@ -8,7 +8,7 @@ import keyBy from 'lodash/keyBy'
 import mapValues from 'lodash/mapValues'
 import { z } from 'zod'
 import { sendMail } from '@src/_helper/mail'
-import moment from 'moment'
+import moment from 'moment-timezone'
 import AuthMiddleWare from '@src/middleware/auth'
 
 const router = express.Router()

@@ -1,5 +1,5 @@
 import 'module-alias/register'
-import 'moment/locale/es'
+import moment from 'moment-timezone'
 import createError from 'http-errors'
 import express from 'express'
 import path from 'path'
@@ -20,6 +20,7 @@ import openClassAPI from './routes/open_class'
 import AuthMiddleWare from './middleware/auth'
 
 const app = express()
+moment.tz.setDefault('Indonesia/Jakarta')
 
 // const corsOptions: CorsOptions = { origin: true, credentials: true, allowedHeaders: '*' }
 

@@ -1,9 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import express from 'express'
-import moment from 'moment'
-import fs from 'fs'
-import { Encriptor } from '@src/_helper/encryptor'
-import { paginate, prismaX } from '@src/_helper/pagination'
+import moment from 'moment-timezone'
 import keyBy from 'lodash/keyBy'
 import mapValues from 'lodash/mapValues'
 import { z } from 'zod'
@@ -51,7 +48,7 @@ router.post('/create', async (req: any, res: any) => {
   } catch (err: any) {
     const keyByErrors = keyBy(err?.errors, 'path.0')
     const errors = mapValues(keyByErrors, 'message')
-    return res.status(400).json({ status: 'failed', message: errors })
+    return res.status(400).json({ status: 'failed', message: errors, err })
   }
 })
 
@@ -65,10 +62,12 @@ router.get('/:service(studio|functional)', async (req: any, res: any) => {
     const serviceObj = { studio: 2, functional: 3 }
     const date = req?.query?.date
     const gte = moment(date)
+      // .utc(date)
       // .local()
       // .utc()
       .toISOString()
-    const lt = moment(gte)
+    const lt = moment(date)
+      // .utc(date)
       // .set({ hours: 0, minutes: 0, seconds: 0 })
       .add(1, 'd')
       // .local()
@@ -101,7 +100,7 @@ router.get('/:service(studio|functional)', async (req: any, res: any) => {
       lt,
       isDST: moment(date).isDST(),
       isUTC: moment(date).isUTC(),
-      utcOffset: moment(date).utcOffset(),
+      utcOffset: moment().utcOffset(),
       isLocal: moment(date).isLocal(),
       data: mappedData,
     })

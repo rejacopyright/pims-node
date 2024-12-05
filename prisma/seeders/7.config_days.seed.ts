@@ -1,7 +1,7 @@
 // npx ts-node prisma/seeders/7.config_days.seed.ts
 
 import { PrismaClient } from '@prisma/client'
-import moment from 'moment'
+import moment from 'moment-timezone'
 
 const prisma = new PrismaClient()
 

@@ -1,7 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import { paginate, prismaX } from '@src/_helper/pagination'
 import express from 'express'
-import moment from 'moment'
+import moment from 'moment-timezone'
 const router = express.Router()
 
 const prisma = new PrismaClient()
