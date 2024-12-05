@@ -20,7 +20,7 @@ import openClassAPI from './routes/open_class'
 import AuthMiddleWare from './middleware/auth'
 
 const app = express()
-moment.tz.setDefault('Indonesia/Jakarta')
+moment.tz.setDefault('Asia/Jakarta')
 
 // const corsOptions: CorsOptions = { origin: true, credentials: true, allowedHeaders: '*' }
 
