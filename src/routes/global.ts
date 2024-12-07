@@ -16,7 +16,7 @@ router.get('/config', async (req: any, res: any) => {
 })
 
 router.get('/payment_method', async (req: any, res: any) => {
-  const data = await prisma.payment_method.findMany()
+  const data = await prisma.payment_method.findMany({ where: { status: 1 } })
   return res.status(200).json(data)
 })
 

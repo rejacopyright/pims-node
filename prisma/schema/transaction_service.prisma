@@ -8,6 +8,7 @@ model transaction_service {
   /// Locattion Branch
   branch_id           String?
   payment_id          String
+  payment             Json?
   service_id          Int
   // If service is class (Studio / Functional) / service_id in [2,3]
   class_schedule_id   String?

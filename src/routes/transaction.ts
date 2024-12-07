@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client'
 import express from 'express'
 import moment from 'moment-timezone'
 import { Encriptor } from '@src/_helper/encryptor'
+import { coreApi, createTransaction } from '@src/_helper/midtrans'
 const router = express.Router()
 
 const prisma = new PrismaClient({
@@ -42,12 +43,20 @@ router.post('/visit', async (req: any, res: any) => {
 
     prisma.$transaction(async () => {
       if (user_id) {
+        const payment = await createTransaction({
+          order_no,
+          type: 'visit',
+          product_name: 'Gym Visit',
+          requestBody: req?.body || {},
+          user: data,
+        })
         const transaction = await prisma.transaction_service.create({
           data: {
             order_no,
             user_id,
             user_type,
             payment_id,
+            payment,
             service_id,
             purchase_expired,
             product_fee,
@@ -97,13 +106,24 @@ router.post('/class', async (req: any, res: any) => {
       voucher_id,
       total_fee,
     } = req?.body || {}
-    const data = await prisma.user.findFirst({ where: { id: user?.id } })
+    const userDetail = await prisma.user.findFirst({ where: { id: user?.id } })
+    const class_schedule = await prisma.class_schedule.findUnique({
+      where: { id: class_schedule_id },
+      include: { class: true },
+    })
+    const classStore = class_schedule?.class
+    const classType =
+      classStore?.service_id === 2
+        ? 'Kelas Studio'
+        : classStore?.service_id === 3
+          ? 'Kelas Fungsional'
+          : 'Kelas Studio'
     const payment_method = await prisma.payment_method.findFirst({ where: { name: payment_id } })
-    const encryptedUsername = Encriptor.encrypt(data?.username, 'RJ')
+    const encryptedUsername = Encriptor.encrypt(userDetail?.username, 'RJ')
     // const decrypted = Encriptor.decrypt(encryptedUsername, 'RJ')
 
     const order_no = `${service_id === 2 ? 'STD' : 'FS'}${moment().format(`YYMMDDHHmmss`)}-${encryptedUsername}`
-    const user_id = data?.id || ''
+    const user_id = userDetail?.id || ''
     const purchase_expired = moment()
       .set({ seconds: 0, milliseconds: 0 })
       .add({ minutes: payment_method?.deadline || 30 })
@@ -111,6 +131,13 @@ router.post('/class', async (req: any, res: any) => {
 
     prisma.$transaction(async () => {
       if (user_id) {
+        const payment = await createTransaction({
+          order_no,
+          type: 'order',
+          product_name: `${classStore?.name || ''} (${classType})`,
+          requestBody: req?.body || {},
+          user: userDetail,
+        })
         const transaction = await prisma.transaction_service.create({
           data: {
             order_no,
@@ -118,6 +145,7 @@ router.post('/class', async (req: any, res: any) => {
             user_id,
             user_type,
             payment_id,
+            payment,
             service_id,
             purchase_expired,
             product_fee,

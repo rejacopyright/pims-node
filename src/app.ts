@@ -17,6 +17,8 @@ import transactionAPI from './routes/transaction'
 import orderAPI from './routes/order'
 import classAPI from './routes/class'
 import openClassAPI from './routes/open_class'
+import paymentAPI from './routes/payment'
+import webhookAPI from './routes/webhook'
 import AuthMiddleWare from './middleware/auth'
 
 const app = express()
@@ -45,6 +47,8 @@ app.use('/api/v1/order', AuthMiddleWare, orderAPI)
 app.use('/api/v1/users', AuthMiddleWare, usersAPI)
 app.use('/api/v1/class/open', AuthMiddleWare, openClassAPI)
 app.use('/api/v1/class', AuthMiddleWare, classAPI)
+app.use('/api/v1/payment', AuthMiddleWare, paymentAPI)
+app.use('/api/v1/webhook', webhookAPI)
 app.use('/api/v1', AuthMiddleWare, accountAPI)
 
 // catch 404 and forward to error handler
