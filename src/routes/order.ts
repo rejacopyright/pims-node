@@ -30,15 +30,23 @@ router.get('/:status(unpaid|active|done|cancel)', async (req: any, res: any) => 
     const { user } = req
     const { status } = req?.params
     const statusObj = { unpaid: 1, active: 2, done: 3, cancel: 4 }
-    await prisma.transaction_service.updateMany({
-      where: { user_id: user?.id, status: 1, purchase_expired: { lt: moment().toISOString() } },
-      data: {
-        status: 4,
-        canceled_at: moment().toISOString(),
-        canceled_by: 1,
-        cancel_reason: 'Gymers tidak membayar booking melebihi batas akhir pembayaran',
-      },
-    })
+    if (status === 'unpaid') {
+      await prisma.transaction_service.updateMany({
+        where: { user_id: user?.id, status: 1, purchase_expired: { lt: moment().toISOString() } },
+        data: {
+          status: 4,
+          canceled_at: moment().toISOString(),
+          canceled_by: 1,
+          cancel_reason: 'Gymers tidak membayar booking melebihi batas akhir pembayaran',
+        },
+      })
+    }
+    if (status === 'active') {
+      await prisma.transaction_service.updateMany({
+        where: { user_id: user?.id, status: 2, valid_to: { lte: moment().toISOString() } },
+        data: { status: 3 },
+      })
+    }
     const data = await prismaX.transaction_service.paginate({
       page,
       limit,
