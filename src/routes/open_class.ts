@@ -87,6 +87,21 @@ router.get('/:service(studio|functional)', async (req: any, res: any) => {
     const mappedData = await Promise.all(
       data?.map(async (item) => {
         const newItem: any = item
+        const transaction = await prisma.transaction_service.findMany({
+          where: { class_schedule_id: item?.id },
+        })
+        newItem.transaction = await Promise.all(
+          transaction?.map(async (trx) => {
+            const newTrx: any = trx
+            if (trx.user_id) {
+              newTrx.user = await prisma.user.findUnique({ where: { id: trx.user_id } })
+              newTrx.user.full_name = newTrx?.user?.first_name
+                ? `${newTrx?.user?.first_name} ${newTrx?.user?.last_name}`
+                : newTrx?.user?.username
+            }
+            return newTrx
+          })
+        )
         if (item?.trainer_id) {
           const trainer = await prisma.user.findUnique({ where: { id: item?.trainer_id } })
           newItem.trainer = trainer
@@ -119,6 +134,21 @@ router.get('/:id/detail', async (req: any, res: any) => {
         mappedData.trainer.full_name = `${trainer?.first_name} ${trainer?.last_name}`
       }
     }
+    const transaction = await prisma.transaction_service.findMany({
+      where: { class_schedule_id: data?.id },
+    })
+    mappedData.transaction = await Promise.all(
+      transaction?.map(async (trx) => {
+        const newTrx: any = trx
+        if (trx.user_id) {
+          newTrx.user = await prisma.user.findUnique({ where: { id: trx.user_id } })
+          newTrx.user.full_name = newTrx?.user?.first_name
+            ? `${newTrx?.user?.first_name} ${newTrx?.user?.last_name}`
+            : newTrx?.user?.username
+        }
+        return newTrx
+      })
+    )
     return res.status(200).json(mappedData)
   } catch (err: any) {
     return res.status(400).json({ status: 'failed', message: err })
