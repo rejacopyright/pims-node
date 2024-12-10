@@ -63,7 +63,7 @@ router.get('/:service(studio|functional)', async (req: any, res: any) => {
     const { service } = req?.params
     const serviceObj = { studio: 2, functional: 3 }
     const date = req?.query?.date
-    const gte = moment(date)
+    const gt = moment()
       // .utc(date)
       // .local()
       // .utc()
@@ -78,7 +78,7 @@ router.get('/:service(studio|functional)', async (req: any, res: any) => {
     const data = await prisma.class_schedule.findMany({
       // where: { service_id: serviceObj[service], start_date: { gte, lt } },
       where: {
-        AND: [{ service_id: serviceObj[service] }, { start_date: { gte } }, { start_date: { lt } }],
+        AND: [{ service_id: serviceObj[service] }, { start_date: { gt } }, { start_date: { lt } }],
         // OR: [{ start_date: { gte } }, { start_date: { lt } }],
       },
       include: { class: { include: { class_gallery: true } } },

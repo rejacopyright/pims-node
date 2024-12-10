@@ -13,6 +13,7 @@ model user {
   last_name     String?
   avatar        String?
   nik           Int?
+  nik_file      String?
   birth         DateTime?
   /// 1[Man] 2[Woman] 3[Other]
   gender        Int?
