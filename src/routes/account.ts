@@ -4,6 +4,9 @@ import { sendMail } from '@helper/mail'
 import { paginate, prismaX } from '@helper/pagination'
 import moment from 'moment-timezone'
 import fs from 'fs'
+import keyBy from 'lodash/keyBy'
+import mapValues from 'lodash/mapValues'
+import { z } from 'zod'
 
 const router = express.Router()
 
@@ -16,6 +19,11 @@ const prisma = new PrismaClient({
       deleted: true,
     },
   },
+})
+
+export const UpdateProfileValidator = z.object({
+  first_name: z.string({ required_error: 'First Name is required' }),
+  last_name: z.string({ required_error: 'Last Name is required' }),
 })
 
 router.get('/test', async (req: any, res: any) => {
@@ -129,7 +137,115 @@ router.post('/update/avatar', async (req: any, res: any) => {
       where: { id: user?.id },
       data: { avatar: filename },
     })
-    return res.status(200).json({ status: 'success', message: 'Kelas berhasil dibuat', data })
+    return res.status(200).json({ status: 'success', message: 'Foto Profil berhasil diubah', data })
+  } catch (err: any) {
+    return res.status(400).json({ status: 'failed', message: err })
+  }
+})
+
+router.post('/update/nik', async (req: any, res: any) => {
+  const user = await prisma.user.findUnique({ where: { id: req?.user?.id } })
+  const { nik } = req?.body
+
+  try {
+    const dir = 'public/images/nik'
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir)
+    }
+    const oldNIK = `${dir}/${user?.nik_file}`
+    if (user?.nik_file && fs.existsSync(oldNIK)) {
+      fs.unlink(oldNIK, () => '')
+    }
+    const base64 = nik?.split(',')
+    const base64Ext = base64?.[0]?.toLowerCase()
+    const base64Data = base64?.[1]
+    let ext = 'png'
+    // var base64_buffer = Buffer.from(base64, 'base64')
+    if (base64Ext?.indexOf('jpeg') !== -1) {
+      ext = 'jpg'
+    }
+    const filename = `${user?.username}_${moment().format('YYYYMMDDHHmmss')}.${ext}`
+
+    fs.writeFile(`${dir}/${filename}`, base64Data, 'base64', () => '')
+    const data = await prisma.user.update({
+      where: { id: user?.id },
+      data: { nik_file: filename },
+    })
+    return res.status(200).json({ status: 'success', message: 'KTP berhasil diubah', data })
+  } catch (err: any) {
+    return res.status(400).json({ status: 'failed', message: err })
+  }
+})
+
+router.post('/update/profile', async (req: any, res: any) => {
+  const user = await prisma.user.findUnique({ where: { id: req?.user?.id } })
+  const {
+    email,
+    first_name,
+    last_name,
+    phone,
+    nik,
+    nik_file,
+    nik_url,
+    birth,
+    gender,
+    marital,
+    religion_id,
+    occupation_id,
+    province_id,
+    city_id,
+    address,
+    social,
+  } = req?.body
+
+  try {
+    const isExist = await prisma.user.findFirst({ where: { nik, NOT: { id: user?.id } } })
+    if (isExist) {
+      return res.status(400).json({ status: 'failed', message: 'NIK sudah terdaftar' })
+    }
+    const data = await prisma.user.update({
+      where: { id: user?.id },
+      data: UpdateProfileValidator.passthrough()
+        .partial()
+        .parse({
+          email,
+          first_name,
+          last_name,
+          phone,
+          nik,
+          birth: moment(birth).toISOString(),
+          gender,
+          marital,
+          religion_id,
+          occupation_id,
+          province_id,
+          city_id,
+          address,
+          social,
+        }),
+    })
+    return res.status(200).json({ status: 'success', message: 'Profile berhasil dibuat', data })
+  } catch (err: any) {
+    const keyByErrors = keyBy(err?.errors, 'path.0')
+    const errors = mapValues(keyByErrors, 'message')
+    return res.status(400).json({ status: 'failed', message: errors, err })
+  }
+})
+
+router.delete('/delete/nik', async (req: any, res: any) => {
+  const user = await prisma.user.findUnique({ where: { id: req?.user?.id } })
+
+  try {
+    const dir = 'public/images/nik'
+    const oldNIK = `${dir}/${user?.nik_file}`
+    if (user?.nik_file && fs.existsSync(oldNIK)) {
+      fs.unlink(oldNIK, () => '')
+    }
+    const data = await prisma.user.update({
+      where: { id: user?.id },
+      data: { nik_file: null },
+    })
+    return res.status(200).json({ status: 'success', message: 'KTP berhasil dihapus', data })
   } catch (err: any) {
     return res.status(400).json({ status: 'failed', message: err })
   }

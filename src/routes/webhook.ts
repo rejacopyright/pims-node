@@ -19,7 +19,10 @@ router.post('/midtrans/callback', async (req: any, res: any) => {
   const body = req.body
 
   try {
-    if (body?.metadata?.type === 'order' && body?.transaction_status === 'settlement') {
+    if (
+      ['order', 'visit'].includes(body?.metadata?.type) &&
+      body?.transaction_status === 'settlement'
+    ) {
       const config = await prisma.config.findFirst()
       const thisTransaction = await prisma.transaction_service.findFirst({
         where: { order_no: body?.order_id },
