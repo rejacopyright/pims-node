@@ -1,0 +1,27 @@
+model member_package {
+  id                   String     @id @default(uuid())
+  level                Int        @unique
+  /// 0[Inactive] 1[Active]
+  status               Int        @default(1)
+  name                 String
+  fee                  Float?     @default(0)
+  /// Fee before discount
+  fee_before           Float?
+  /// in days
+  duration             Int        @default(30)
+  /// Null for unlimited
+  quota_visit_per_day  Int?
+  quota_class_per_day  Int?       @default(2)
+  /// Badge Asset
+  badge                String?
+  color                String?
+  secondary_color      String?
+  description          String?
+  tnc                  String?
+  created_at           DateTime   @default(now())
+  updated_at           DateTime   @updatedAt
+  deleted              DateTime?
+
+  member_features      member_features[]
+  member_items         member_items[]
+}

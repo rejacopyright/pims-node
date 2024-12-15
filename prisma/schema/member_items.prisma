@@ -1,0 +1,17 @@
+model member_items {
+  id                   String     @id @default(uuid())
+  member_id            String
+  service_id           String
+  /// If service_id in (2,3)
+  class_id             String?
+  /// 0[Inactive] 1[Active]
+  status               Int        @default(1)
+  fee                  Float?
+  /// Null for unlimited
+  quota                Int?
+  created_at           DateTime   @default(now())
+  updated_at           DateTime   @updatedAt
+  deleted              DateTime?
+
+  member               member_package   @relation(fields: [member_id], references: [id], onDelete: Cascade)
+}

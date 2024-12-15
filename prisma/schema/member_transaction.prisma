@@ -1,0 +1,20 @@
+model member_transaction {
+  id                   String     @id @default(uuid())
+  member_id            String?
+  user_id              String
+  /// 1[Unpaid] 2[Active] 3[Done] 4[Cancel]
+  status               Int        @default(1)
+  /// Fee is getting from member_store.fee
+  fee                  Float?     @default(0)
+  /// in days (Duraion is getting from member_store.duration)
+  duration             Int        @default(30)
+  start_date           DateTime
+  end_date             DateTime
+  canceled_at          DateTime?
+  /// 1[System] 2[User] 3[Admin]
+  canceled_by          Int?
+  cancel_reason        String?
+  created_at           DateTime   @default(now())
+  updated_at           DateTime   @updatedAt
+  deleted              DateTime?
+}

@@ -1,0 +1,14 @@
+model member_features {
+  id                   String         @id @default(uuid())
+  member_id            String
+  index                Int?           @default(1)
+  icon                 String?
+  title                String?
+  sub_title            String?
+  value                String?
+  created_at           DateTime       @default(now())
+  updated_at           DateTime       @updatedAt
+  deleted              DateTime?
+  
+  member               member_package   @relation(fields: [member_id], references: [id], onDelete: Cascade)
+}
