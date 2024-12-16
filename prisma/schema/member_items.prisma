@@ -1,7 +1,7 @@
 model member_items {
   id                   String     @id @default(uuid())
   member_id            String
-  service_id           String
+  service_id           Int
   /// If service_id in (2,3)
   class_id             String?
   /// 0[Inactive] 1[Active]

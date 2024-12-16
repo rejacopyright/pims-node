@@ -89,13 +89,27 @@ router.get('/:service(studio|functional)', async (req: any, res: any) => {
     const q = req?.query?.q || ''
     const page = Number(req?.query?.page) || 1
     const limit = Number(req?.query?.limit) || 10
+
+    const member_id = req?.query?.member_id || null
+    let class_ids: any = []
+    if (member_id) {
+      class_ids = await prisma.member_items.findMany({
+        where: { member_id },
+        select: { class_id: true },
+      })
+    }
     const { service } = req?.params
     const serviceObj = { studio: 2, functional: 3 }
     const data = await prismaX.class_store.paginate({
       page,
       limit,
       where: {
-        AND: [{ service_id: serviceObj[service] }],
+        AND: [
+          {
+            service_id: serviceObj[service],
+            id: { notIn: class_ids?.map(({ class_id }) => class_id)?.filter((f) => f) },
+          },
+        ],
         OR: [
           {
             name: { contains: q?.toString(), mode: 'insensitive' },
