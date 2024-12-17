@@ -62,7 +62,7 @@ router.get('/:member_id', async (req: any, res: any) => {
         return newItem
       })
     )
-    const hasVisit = (await prisma.member_items.count({ where: { service_id: 1 } })) > 0
+    const hasVisit = (await prisma.member_items.count({ where: { service_id: 1, member_id } })) > 0
     return res.status(200).json({ hasVisit, ...data })
   } catch (err: any) {
     return res.status(400).json({ status: 'failed', message: err })

@@ -40,6 +40,7 @@ router.get('/', async (req: any, res: any) => {
           // { description: { contains: q?.toString(), mode: 'insensitive' } },
         ],
       },
+      include: { member_features: true },
       orderBy: { level: 'asc' },
       // orderBy: { updated_at: 'desc' },
     })
