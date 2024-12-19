@@ -1,15 +1,21 @@
 model member_transaction {
   id                   String     @id @default(uuid())
+  order_no             String    @unique
+  branch_id            String?
   member_id            String?
   user_id              String
+  payment_id           String
+  payment              Json?
   /// 1[Unpaid] 2[Active] 3[Done] 4[Cancel]
   status               Int        @default(1)
   /// Fee is getting from member_store.fee
   fee                  Float?     @default(0)
   /// in days (Duraion is getting from member_store.duration)
   duration             Int        @default(30)
-  start_date           DateTime
-  end_date             DateTime
+  purchase_expired     DateTime?
+  purchased_at         DateTime?
+  start_date           DateTime?
+  end_date             DateTime?
   canceled_at          DateTime?
   /// 1[System] 2[User] 3[Admin]
   canceled_by          Int?

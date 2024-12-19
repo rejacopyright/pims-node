@@ -20,6 +20,7 @@ import openClassAPI from './routes/open_class'
 import paymentAPI from './routes/payment'
 import memberPackageAPI from './routes/member_package'
 import memberItemsAPI from './routes/member_items'
+import memberTransactionAPI from './routes/member_transaction'
 import webhookAPI from './routes/webhook'
 import AuthMiddleWare from './middleware/auth'
 
@@ -52,6 +53,7 @@ app.use('/api/v1/class', AuthMiddleWare, classAPI)
 app.use('/api/v1/payment', AuthMiddleWare, paymentAPI)
 app.use('/api/v1/member/package', AuthMiddleWare, memberPackageAPI)
 app.use('/api/v1/member/items', AuthMiddleWare, memberItemsAPI)
+app.use('/api/v1/member/transaction', AuthMiddleWare, memberTransactionAPI)
 app.use('/api/v1/webhook', webhookAPI)
 app.use('/api/v1', AuthMiddleWare, accountAPI)
 

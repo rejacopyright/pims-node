@@ -7,6 +7,7 @@ import fs from 'fs'
 import keyBy from 'lodash/keyBy'
 import mapValues from 'lodash/mapValues'
 import { z } from 'zod'
+import { getServer, toCapitalize } from '@src/_helper/function'
 
 const router = express.Router()
 
@@ -38,6 +39,7 @@ router.get('/test', async (req: any, res: any) => {
 })
 
 router.get('/me', async (req: any, res: any) => {
+  const server = getServer(req)
   const { user } = req
   const data = await prisma.user.findFirst({
     where: {
@@ -50,7 +52,34 @@ router.get('/me', async (req: any, res: any) => {
       city: true,
     },
   })
-  return res.status(200).json(data)
+  const full_name = toCapitalize(
+    data?.first_name ? `${data?.first_name} ${data?.last_name || ''}` : data?.username
+  )
+  const avatar = `public/images/user/${data?.avatar}`
+  const avatar_link =
+    data?.avatar && fs.existsSync(avatar) ? `${server}/static/images/user/${data?.avatar}` : null
+  const memberQuery = { user_id: data?.id, status: { in: [1, 2] } }
+  let membership = await prisma.member_transaction.findFirst({ where: memberQuery })
+  let member = membership?.member_id
+    ? await prisma.member_package.findFirst({
+        where: { id: membership?.member_id },
+        include: { member_features: true },
+      })
+    : null
+
+  if (member?.badge) {
+    member.badge = member?.badge ? `${server}/static/images/member_package/${member?.badge}` : null
+  }
+
+  if (membership?.id && moment(membership?.purchase_expired).isBefore(moment())) {
+    await prisma.member_transaction.delete({
+      where: { id: membership?.id, purchase_expired: { lt: moment().toISOString() } },
+    })
+    membership = null
+    member = null
+  }
+
+  return res.status(200).json({ ...data, avatar_link, full_name, membership, member })
 })
 
 router.get('/voucher', async (req: any, res: any) => {

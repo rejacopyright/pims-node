@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client'
 import express from 'express'
 import moment from 'moment-timezone'
 import { Encriptor } from '@src/_helper/encryptor'
-import { coreApi, createTransaction } from '@src/_helper/midtrans'
+import { coreApi, createTransaction, createTransactionType } from '@src/_helper/midtrans'
 const router = express.Router()
 
 const prisma = new PrismaClient({
@@ -168,6 +168,60 @@ router.post('/class', async (req: any, res: any) => {
           status: 'success',
           data: transaction,
           message: 'Berhasil membuat reservasi Kelas',
+        })
+      } else {
+        return res.status(400).json({ status: 'failed', message: 'User not found' })
+      }
+    })
+  } catch (err: any) {
+    return res.status(400).json({ status: 'failed', message: err })
+  }
+})
+
+router.post('/member', async (req: any, res: any) => {
+  try {
+    const { user } = req
+    const { member_id, payment_id, total_fee, duration } = req?.body || {}
+    const userDetail = await prisma.user.findFirst({ where: { id: user?.id } })
+    const encryptedUsername = Encriptor.encrypt(userDetail?.username, 'RJ')
+    // const decrypted = Encriptor.decrypt(encryptedUsername, 'RJ')
+
+    const order_no = `MB${moment().format(`YYMMDDHHmmss`)}-${encryptedUsername}`
+    const user_id = userDetail?.id || ''
+
+    prisma.$transaction(async () => {
+      const custom_expiry: createTransactionType['custom_expiry'] = {
+        expiry_duration: 1,
+        unit: 'day',
+      }
+      if (user_id) {
+        const payment = await createTransaction({
+          order_no,
+          type: 'member',
+          product_name: `Member`,
+          requestBody: req?.body || {},
+          user: userDetail,
+          custom_expiry: custom_expiry,
+        })
+        const purchase_expired = moment()
+          .add({ [custom_expiry.unit]: custom_expiry.expiry_duration })
+          .toISOString()
+        const transaction = await prisma.member_transaction.create({
+          data: {
+            order_no,
+            member_id,
+            user_id,
+            payment_id,
+            payment,
+            purchase_expired,
+            fee: total_fee,
+            duration,
+          },
+        })
+        return res.status(200).json({
+          status: 'success',
+          data: transaction,
+          message: 'Permintaan member berhasil dibuat',
         })
       } else {
         return res.status(400).json({ status: 'failed', message: 'User not found' })

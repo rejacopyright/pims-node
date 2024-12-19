@@ -19,12 +19,16 @@ export const coreApi = new midtransClient.CoreApi({
   serverKey: MIDTRANS_SERVER_KEY,
 })
 
-interface createTransactionType {
+export interface createTransactionType {
   order_no: string
   type: string
   product_name: string
   requestBody: any
   user: any
+  custom_expiry?: {
+    expiry_duration: number
+    unit: 'second' | 'minute' | 'hour' | 'day'
+  }
 }
 
 export const createTransaction = async ({
@@ -33,6 +37,7 @@ export const createTransaction = async ({
   product_name,
   requestBody,
   user,
+  custom_expiry,
 }: createTransactionType) => {
   const { payment_id } = requestBody || {}
   const payment_method = await prisma.payment_method.findFirst({ where: { name: payment_id } })
@@ -41,8 +46,10 @@ export const createTransaction = async ({
   const globalOptions = {
     custom_expiry: {
       order_time: moment().format('yyyy-MM-DD HH:mm:ss ZZ'),
-      expiry_duration: payment_method?.deadline || 30,
-      unit: 'minute',
+      expiry_duration: custom_expiry?.expiry_duration
+        ? custom_expiry?.expiry_duration
+        : payment_method?.deadline || 30,
+      unit: custom_expiry?.unit ? custom_expiry?.unit : 'minute',
     },
     metadata: {
       type,

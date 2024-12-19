@@ -65,7 +65,9 @@ router.get('/:id/detail', async (req: any, res: any) => {
       include: { member_features: true },
     })
     const newData: any = data || {}
-    newData.badge = data?.badge ? `${server}/static/images/member_package/${data?.badge}` : null
+    if (data?.badge) {
+      newData.badge = data?.badge ? `${server}/static/images/member_package/${data?.badge}` : null
+    }
     return res.status(200).json(newData)
   } catch (err: any) {
     return res.status(400).json({ status: 'failed', message: err })
