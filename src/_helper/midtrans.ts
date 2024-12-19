@@ -13,7 +13,14 @@ const prisma = new PrismaClient({
 
 dotenv.config()
 const { MIDTRANS_CLIENT_KEY, MIDTRANS_SERVER_KEY }: any = process.env
+
 export const coreApi = new midtransClient.CoreApi({
+  isProduction: false,
+  clientKey: MIDTRANS_CLIENT_KEY,
+  serverKey: MIDTRANS_SERVER_KEY,
+})
+
+export const apiClient = new midtransClient.Snap({
   isProduction: false,
   clientKey: MIDTRANS_CLIENT_KEY,
   serverKey: MIDTRANS_SERVER_KEY,

@@ -67,6 +67,19 @@ router.post('/midtrans/callback', async (req: any, res: any) => {
         where: { order_no: body?.order_id },
       })
       if (body?.transaction_status === 'settlement') {
+        await prisma.member_transaction.updateMany({
+          where: {
+            user_id: thisTransaction?.user_id,
+            status: 2,
+            NOT: [{ order_no: body?.order_id }],
+          },
+          data: {
+            status: 4,
+            canceled_at: moment().toISOString(),
+            canceled_by: 2,
+            cancel_reason: 'Membership changed by User',
+          },
+        })
         const transaction = await prisma.member_transaction.update({
           where: { order_no: body?.order_id },
           data: {

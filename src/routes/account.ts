@@ -58,8 +58,35 @@ router.get('/me', async (req: any, res: any) => {
   const avatar = `public/images/user/${data?.avatar}`
   const avatar_link =
     data?.avatar && fs.existsSync(avatar) ? `${server}/static/images/user/${data?.avatar}` : null
-  const memberQuery = { user_id: data?.id, status: { in: [1, 2] } }
-  let membership = await prisma.member_transaction.findFirst({ where: memberQuery })
+  let membership = await prisma.member_transaction.findFirst({
+    where: { user_id: data?.id, status: 2 },
+  })
+  let pending_membership = await prisma.member_transaction.findMany({
+    where: { user_id: data?.id, status: 1 },
+  })
+  // Automatic Done by Active End Date
+  // await prisma.member_transaction.updateMany({
+  //   where: { user_id: data?.id, status: 2, end_date: { lte: moment().toISOString() } },
+  //   data: { status: 3 },
+  // })
+  pending_membership = await Promise.all(
+    pending_membership?.map(async (item) => {
+      const newItem: any = item
+      newItem.member = item?.member_id
+        ? await prisma.member_package.findFirst({
+            where: { id: item?.member_id },
+            include: { member_features: true },
+          })
+        : null
+      if (newItem?.member?.badge) {
+        newItem.member.badge = newItem?.member?.badge
+          ? `${server}/static/images/member_package/${newItem?.member?.badge}`
+          : null
+      }
+      return newItem
+    })
+  )
+
   let member = membership?.member_id
     ? await prisma.member_package.findFirst({
         where: { id: membership?.member_id },
@@ -71,15 +98,19 @@ router.get('/me', async (req: any, res: any) => {
     member.badge = member?.badge ? `${server}/static/images/member_package/${member?.badge}` : null
   }
 
+  // Automatic Done by Active End Date
   if (membership?.id && moment(membership?.purchase_expired).isBefore(moment())) {
-    await prisma.member_transaction.delete({
-      where: { id: membership?.id, purchase_expired: { lt: moment().toISOString() } },
+    await prisma.member_transaction.updateMany({
+      where: { id: membership?.id, status: 2, purchase_expired: { lte: moment().toISOString() } },
+      data: { status: 3 },
     })
     membership = null
     member = null
   }
 
-  return res.status(200).json({ ...data, avatar_link, full_name, membership, member })
+  return res
+    .status(200)
+    .json({ ...data, avatar_link, full_name, membership, member, pending_membership })
 })
 
 router.get('/voucher', async (req: any, res: any) => {
