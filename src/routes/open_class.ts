@@ -63,7 +63,7 @@ router.get('/:service(studio|functional)', async (req: any, res: any) => {
     const { service } = req?.params
     const serviceObj = { studio: 2, functional: 3 }
     const date = req?.query?.date
-    const gt = moment()
+    const gt = moment(date)
       // .utc(date)
       // .local()
       // .utc()
@@ -78,7 +78,12 @@ router.get('/:service(studio|functional)', async (req: any, res: any) => {
     const data = await prisma.class_schedule.findMany({
       // where: { service_id: serviceObj[service], start_date: { gte, lt } },
       where: {
-        AND: [{ service_id: serviceObj[service] }, { start_date: { gt } }, { start_date: { lt } }],
+        AND: [
+          { service_id: serviceObj[service] },
+          { start_date: { gt: moment().toISOString() } },
+          { start_date: { gt } },
+          { start_date: { lt } },
+        ],
         // OR: [{ start_date: { gte } }, { start_date: { lt } }],
       },
       include: { class: { include: { class_gallery: true } } },
@@ -122,10 +127,24 @@ router.get('/:service(studio|functional)', async (req: any, res: any) => {
 router.get('/:id/detail', async (req: any, res: any) => {
   try {
     const { id } = req?.params
+    const auth = req?.user
+
     const data = await prisma.class_schedule.findUnique({
-      where: { id: id },
+      where: { id },
       include: { class: { include: { class_gallery: true } } },
     })
+
+    // FOR MEMBERSHIP
+    const membership = await prisma.member_transaction.findFirst({
+      where: { user_id: auth?.id, status: 2, end_date: { gte: moment().toISOString() } },
+    })
+    let member_class: any = null
+    if (membership?.member_id) {
+      member_class = await prisma.member_items.findFirst({
+        where: { member_id: membership?.member_id, class_id: data?.class_id },
+      })
+    }
+
     const mappedData: any = data
     if (data?.trainer_id) {
       const trainer = await prisma.user.findUnique({ where: { id: data?.trainer_id } })
@@ -149,7 +168,9 @@ router.get('/:id/detail', async (req: any, res: any) => {
         return newTrx
       })
     )
-    return res.status(200).json(mappedData)
+    return res
+      .status(200)
+      .json({ isMember: Boolean(membership?.member_id), member_class, ...mappedData })
   } catch (err: any) {
     return res.status(400).json({ status: 'failed', message: err })
   }

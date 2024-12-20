@@ -133,4 +133,23 @@ router.post('/:id/cancel', async (req: any, res: any) => {
   }
 })
 
+// Check Membership Visit
+router.get('/check/member/visit', async (req: any, res: any) => {
+  try {
+    const auth = req?.user
+    const membership = await prisma.member_transaction.findFirst({
+      where: { user_id: auth?.id, status: 2, end_date: { gte: moment().toISOString() } },
+    })
+    let visit: any = null
+    if (membership?.member_id) {
+      visit = await prisma.member_items.findFirst({
+        where: { member_id: membership?.member_id, service_id: 1 },
+      })
+    }
+    return res.status(200).json({ isMember: Boolean(membership?.member_id), visit })
+  } catch (err: any) {
+    return res.status(400).json({ status: 'failed', message: err })
+  }
+})
+
 export default router

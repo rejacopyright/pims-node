@@ -104,12 +104,8 @@ router.get('/:service(studio|functional)', async (req: any, res: any) => {
       page,
       limit,
       where: {
-        AND: [
-          {
-            service_id: serviceObj[service],
-            id: { notIn: class_ids?.map(({ class_id }) => class_id)?.filter((f) => f) },
-          },
-        ],
+        service_id: serviceObj[service],
+        id: { notIn: class_ids?.map(({ class_id }) => class_id)?.filter((f) => f) },
         OR: [
           {
             name: { contains: q?.toString(), mode: 'insensitive' },
