@@ -48,7 +48,7 @@ export const createTransaction = async ({
 }: createTransactionType) => {
   const { payment_id } = requestBody || {}
   const payment_method = await prisma.payment_method.findFirst({ where: { name: payment_id } })
-  const custom_va = user?.phone && user?.phone?.length > 8 ? user?.phone?.slice(-8) : user?.phone
+  const custom_va = user?.phone && user?.phone?.length > 10 ? user?.phone?.slice(-10) : user?.phone
   let params = {}
   const globalOptions = {
     custom_expiry: {

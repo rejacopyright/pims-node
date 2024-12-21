@@ -36,7 +36,7 @@ router.post('/visit', async (req: any, res: any) => {
     const payment_method = isRegular
       ? await prisma.payment_method.findFirst({ where: { name: payment_id } })
       : null
-    const encryptedUsername = Encriptor.encrypt(data?.username, 'RJ')
+    const encryptedUsername = Encriptor.encrypt(data?.username?.toUpperCase(), 'RJ')
     // const decrypted = Encriptor.decrypt(encryptedUsername, 'RJ')
 
     const order_no = `VST${moment().format(`YYMMDDHHmmss`)}-${encryptedUsername}`
@@ -150,7 +150,7 @@ router.post('/class', async (req: any, res: any) => {
     const payment_method = isRegular
       ? await prisma.payment_method.findFirst({ where: { name: payment_id } })
       : null
-    const encryptedUsername = Encriptor.encrypt(userDetail?.username, 'RJ')
+    const encryptedUsername = Encriptor.encrypt(userDetail?.username?.toUpperCase(), 'RJ')
     // const decrypted = Encriptor.decrypt(encryptedUsername, 'RJ')
 
     const order_no = `${service_id === 2 ? 'STD' : 'FS'}${moment().format(`YYMMDDHHmmss`)}-${encryptedUsername}`
@@ -234,7 +234,7 @@ router.post('/member', async (req: any, res: any) => {
     const { user } = req
     const { member_id, payment_id, total_fee, duration } = req?.body || {}
     const userDetail = await prisma.user.findFirst({ where: { id: user?.id } })
-    const encryptedUsername = Encriptor.encrypt(userDetail?.username, 'RJ')
+    const encryptedUsername = Encriptor.encrypt(userDetail?.username?.toUpperCase(), 'RJ')
     // const decrypted = Encriptor.decrypt(encryptedUsername, 'RJ')
 
     const order_no = `MB${moment().format(`YYMMDDHHmmss`)}-${encryptedUsername}`

@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client'
+import { Encriptor } from '@src/_helper/encryptor'
 import { paginate, prismaX } from '@src/_helper/pagination'
 import express from 'express'
 import moment from 'moment-timezone'
@@ -10,7 +11,8 @@ router.get('/', async (req, res: any, next) => {
   const test = moment().format('yyyy-MM-DD HH:mm:ss ZZ')
   const phoneStr = '085766666393'
   const phone = { sliced: phoneStr?.slice(-8), ln: phoneStr?.length }
-  return res.status(200).json({ oke: 'okelah7', test, phone })
+  const encryptedUsername = Encriptor.encrypt('REJA', 'RJ')
+  return res.status(200).json({ oke: 'okelah7', test, phone, encryptedUsername })
 })
 
 router.get('/religion', async (req, res: any, next) => {

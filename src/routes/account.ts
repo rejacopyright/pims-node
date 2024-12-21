@@ -99,9 +99,9 @@ router.get('/me', async (req: any, res: any) => {
   }
 
   // Automatic Done by Active End Date
-  if (membership?.id && moment(membership?.purchase_expired).isBefore(moment())) {
+  if (membership?.id && moment(membership?.end_date).isBefore(moment())) {
     await prisma.member_transaction.updateMany({
-      where: { id: membership?.id, status: 2, purchase_expired: { lte: moment().toISOString() } },
+      where: { id: membership?.id, status: 2, end_date: { lte: moment().toISOString() } },
       data: { status: 3 },
     })
     membership = null
@@ -148,11 +148,10 @@ router.get('/my-visit', async (req: any, res: any) => {
     const list = await prisma.transaction_service.findMany({
       where: {
         // OR: [{ user_id: user?.id, status: { in: [1, 2] }, start_date: date ? { gte, lt } : {} }],
-        AND: [
-          { user_id: user?.id, status: { in: [1, 2] } },
-          { start_date: date ? { gte } : {} },
-          { start_date: date ? { lt } : {} },
-        ],
+        user_id: user?.id,
+        status: { in: [1, 2] },
+        service_id: 1,
+        AND: [{ start_date: date ? { gte } : {} }, { start_date: date ? { lt } : {} }],
       },
     })
 
