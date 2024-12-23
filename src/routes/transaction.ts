@@ -162,6 +162,15 @@ router.post('/class', async (req: any, res: any) => {
           .toISOString()
       : null
 
+    // Check Quota
+    const bookedCount = await prisma.transaction_service.count({
+      where: { class_schedule_id, status: 2 },
+    })
+    const quota = class_schedule?.quota || 0
+    if (bookedCount >= quota) {
+      return res.status(400).json({ status: 'failed', message: 'Kuota sudah penuh' })
+    }
+
     prisma.$transaction(async () => {
       if (user_id) {
         let payment: any = {}

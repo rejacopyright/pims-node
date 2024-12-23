@@ -4,6 +4,8 @@ import moment from 'moment-timezone'
 import keyBy from 'lodash/keyBy'
 import mapValues from 'lodash/mapValues'
 import { z } from 'zod'
+import fs from 'fs'
+import { getServer } from '@src/_helper/function'
 const router = express.Router()
 
 const prisma = new PrismaClient({
@@ -93,7 +95,7 @@ router.get('/:service(studio|functional)', async (req: any, res: any) => {
       data?.map(async (item) => {
         const newItem: any = item
         const transaction = await prisma.transaction_service.findMany({
-          where: { class_schedule_id: item?.id },
+          where: { class_schedule_id: item?.id, status: 2 },
         })
         newItem.transaction = await Promise.all(
           transaction?.map(async (trx) => {
@@ -125,6 +127,7 @@ router.get('/:service(studio|functional)', async (req: any, res: any) => {
 
 // Class Detail
 router.get('/:id/detail', async (req: any, res: any) => {
+  const server = getServer(req)
   try {
     const { id } = req?.params
     const auth = req?.user
@@ -154,7 +157,7 @@ router.get('/:id/detail', async (req: any, res: any) => {
       }
     }
     const transaction = await prisma.transaction_service.findMany({
-      where: { class_schedule_id: data?.id },
+      where: { class_schedule_id: data?.id, status: 2 },
     })
     mappedData.transaction = await Promise.all(
       transaction?.map(async (trx) => {
@@ -164,6 +167,13 @@ router.get('/:id/detail', async (req: any, res: any) => {
           newTrx.user.full_name = newTrx?.user?.first_name
             ? `${newTrx?.user?.first_name} ${newTrx?.user?.last_name}`
             : newTrx?.user?.username
+
+          const avatar = `public/images/user/${newTrx.user?.avatar}`
+          const avatar_link =
+            newTrx.user?.avatar && fs.existsSync(avatar)
+              ? `${server}/static/images/user/${newTrx.user?.avatar}`
+              : null
+          newTrx.user.avatar_link = avatar_link
         }
         return newTrx
       })

@@ -7,6 +7,7 @@ import { paginate, prismaX } from '@src/_helper/pagination'
 import keyBy from 'lodash/keyBy'
 import mapValues from 'lodash/mapValues'
 import { z } from 'zod'
+import { getServer, getUser } from '@src/_helper/function'
 const router = express.Router()
 
 const prisma = new PrismaClient({
@@ -83,7 +84,62 @@ router.post('/create', async (req: any, res: any) => {
   }
 })
 
-// Get Class List
+// Get Class List All
+router.get('/', async (req: any, res: any) => {
+  const server = getServer(req)
+  try {
+    const q = req?.query?.q || ''
+    const page = Number(req?.query?.page) || 1
+    const limit = Number(req?.query?.limit) || 10
+
+    const service = req?.query?.service
+    const serviceObj = { studio: 2, functional: 3 }
+    const data = await prismaX.class_store.paginate({
+      page,
+      limit,
+      where: {
+        AND: [service ? { service_id: serviceObj[service] } : {}],
+        OR: [
+          {
+            name: { contains: q?.toString(), mode: 'insensitive' },
+          },
+        ],
+      },
+      include: { class_gallery: true },
+      orderBy: { updated_at: 'desc' },
+    })
+    const mappedData = await Promise.all(
+      data?.data?.map(async (item) => {
+        const newItem = item
+        let image: any = null
+        if (item?.class_gallery?.length > 0) {
+          const imagePath = `public/images/class/${item?.class_gallery?.[0]?.filename}`
+          if (fs.existsSync(imagePath)) {
+            image = `${server}/static/images/class/${item?.class_gallery?.[0]?.filename}`
+          }
+        }
+        newItem.image = image
+
+        if (item?.service_id) {
+          newItem.service_name = (
+            await prisma.service.findUnique({ where: { id: item?.service_id } })
+          )?.name?.replace('Kelas ', '')
+        }
+
+        if (item?.default_trainer_id) {
+          newItem.trainer = await getUser(item?.default_trainer_id, req)
+        }
+        return item
+      })
+    )
+    data.data = mappedData
+    return res.status(200).json({ ...data })
+  } catch (err: any) {
+    return res.status(400).json({ status: 'failed', message: err })
+  }
+})
+
+// Get Class List By Service
 router.get('/:service(studio|functional)', async (req: any, res: any) => {
   try {
     const q = req?.query?.q || ''
@@ -123,6 +179,7 @@ router.get('/:service(studio|functional)', async (req: any, res: any) => {
 
 // Class Detail
 router.get('/:id/detail', async (req: any, res: any) => {
+  const server = getServer(req)
   try {
     const { id } = req?.params
     const data = await prisma.class_store.findUnique({
@@ -130,10 +187,31 @@ router.get('/:id/detail', async (req: any, res: any) => {
       include: { class_gallery: true },
     })
     const newData: any = data || {}
-    if (data?.default_trainer_id) {
-      newData.default_trainer = await prisma.user.findUnique({
-        where: { id: data?.default_trainer_id },
+
+    // OPEN CLASS
+    let open_class = await prisma.class_schedule.findMany({
+      where: {
+        class_id: data?.id,
+        start_date: { gt: moment().toISOString() },
+      },
+      orderBy: { start_date: 'asc' },
+    })
+    open_class = await Promise.all(
+      open_class?.map(async (item) => {
+        const newItem: any = item || {}
+        let trainer = null
+        if (item?.trainer_id) {
+          trainer = await getUser(item?.trainer_id, req)
+        }
+        newItem.trainer = trainer
+        return newItem
       })
+    )
+    newData.open_class = open_class
+
+    // TRAINER
+    if (data?.default_trainer_id) {
+      newData.trainer = await getUser(data?.default_trainer_id, req)
     }
     return res.status(200).json(newData)
   } catch (err: any) {
