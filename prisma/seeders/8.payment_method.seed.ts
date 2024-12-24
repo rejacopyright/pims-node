@@ -75,6 +75,14 @@ const data = [
     deadline: 30,
     fee: 0,
   },
+  {
+    type: 4,
+    name: 'corporate',
+    label: 'Corporate',
+    description: 'Dibayar oleh perusahaan',
+    deadline: 30,
+    fee: 0,
+  },
 ]
 
 async function main() {

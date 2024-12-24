@@ -117,7 +117,7 @@ router.post('/:id/cancel', async (req: any, res: any) => {
     const { id } = req?.params
     const { canceled_by, cancel_reason } = req?.body
     const data = await prisma.transaction_service.update({
-      where: { id: id },
+      where: { id },
       data: CancelOrderValidator.partial().parse({
         status: 4,
         canceled_at: moment().toISOString(),

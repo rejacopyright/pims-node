@@ -3,7 +3,7 @@ model member_transaction {
   order_no             String    @unique
   branch_id            String?
   member_id            String?
-  user_id              String
+  user_id              String?
   payment_id           String
   payment              Json?
   /// 1[Unpaid] 2[Active] 3[Done] 4[Cancel]

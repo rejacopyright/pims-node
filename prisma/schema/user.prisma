@@ -2,6 +2,8 @@ model user {
   id            String      @id @default(uuid())
   /// 1[Regular] 2[Member] 3[Trainer] 4[Admin] 5[Owner]
   role_id       Int         @default(1)
+  /// 1[User] 2[Admin] 3[Import]
+  ref           Int         @default(1)
   /// 0[Unconfirmed] 1[Active] 2[Pasive] 3[Inactive]
   status        Int         @default(1)
   username      String      @unique

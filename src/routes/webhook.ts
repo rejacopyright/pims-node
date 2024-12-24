@@ -91,7 +91,12 @@ router.post('/midtrans/callback', async (req: any, res: any) => {
           },
         })
 
-        await prisma.user.update({ where: { id: thisTransaction?.user_id }, data: { role_id: 2 } })
+        if (thisTransaction?.user_id) {
+          await prisma.user.update({
+            where: { id: thisTransaction?.user_id },
+            data: { role_id: 2 },
+          })
+        }
         return res
           .status(200)
           .json({ status: 'success', message: 'Payment success', data: transaction })
