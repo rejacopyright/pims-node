@@ -40,6 +40,7 @@ router.get('/trainer', async (req: any, res: any) => {
           { email: { contains: q?.toString(), mode: 'insensitive' } },
         ],
       },
+      orderBy: { updated_at: 'desc' },
     })
     list.data = list?.data?.map((item) => {
       const newItem: any = omit(item, ['password'])
@@ -122,6 +123,7 @@ router.get('/member', async (req: any, res: any) => {
           { email: { contains: q?.toString(), mode: 'insensitive' } },
         ],
       },
+      orderBy: { updated_at: 'desc' },
     })
     list.data = await Promise.all(
       list?.data?.map(async (item) => {
@@ -160,48 +162,6 @@ router.get('/member', async (req: any, res: any) => {
         return newItem
       })
     )
-
-    return res.status(200).json(list)
-  } catch (error) {
-    res.status(400).json(error)
-  }
-})
-
-router.get('/regular', async (req: any, res: any) => {
-  const server = getServer(req)
-
-  const q = req?.query?.q || ''
-  const page = Number(req?.query?.page) || 1
-  const limit = Number(req?.query?.limit) || 10
-
-  try {
-    const list = await prismaX.user.paginate({
-      page,
-      limit,
-      where: {
-        AND: [{ role_id: 1, status: 1 }],
-        OR: [
-          { first_name: { contains: q?.toString(), mode: 'insensitive' } },
-          { last_name: { contains: q?.toString(), mode: 'insensitive' } },
-          { username: { contains: q?.toString(), mode: 'insensitive' } },
-          { email: { contains: q?.toString(), mode: 'insensitive' } },
-        ],
-      },
-      orderBy: { updated_at: 'desc' },
-    })
-    list.data = list?.data?.map((item) => {
-      const newItem: any = omit(item, ['password'])
-      newItem.full_name = newItem?.first_name
-        ? `${newItem?.first_name} ${newItem?.last_name || ''}`
-        : newItem?.username
-      const avatar = `public/images/user/${newItem?.avatar}`
-      const avatar_link =
-        newItem?.avatar && fs.existsSync(avatar)
-          ? `${server}/static/images/user/${newItem?.avatar}`
-          : null
-      newItem.avatar_link = avatar_link
-      return newItem
-    })
 
     return res.status(200).json(list)
   } catch (error) {
@@ -373,10 +333,33 @@ router.put('/:id/update', async (req, res: any) => {
           phone,
           first_name,
           last_name,
-          password: await bcrypt.hash(password, 10),
+          ...(password ? { password: await bcrypt.hash(password, 10) } : {}),
         },
       })
       return res.status(200).json({ status: 'success', message: 'User successfully updated', data })
+    } catch (err: any) {
+      const keyByErrors = keyBy(err?.errors, 'path.0')
+      const errors = mapValues(keyByErrors, 'message')
+      return res.status(400).json({ status: 'failed', message: errors })
+    }
+  })
+})
+
+router.post('/:id/move/:role(regular|trainer|member)', async (req, res: any) => {
+  const { id, role } = req?.params
+  const roleObj = { regular: 1, member: 2, trainer: 3 }
+  const role_id = roleObj?.[role]
+
+  prisma.$transaction(async () => {
+    try {
+      const data = await prisma.user.update({ where: { id }, data: { role_id } })
+      if (role === 'regular') {
+        await prisma.member_transaction.updateMany({
+          where: { user_id: data?.id, status: 2 },
+          data: { status: 3 },
+        })
+      }
+      return res.status(200).json({ status: 'success', message: 'User successfully moved', data })
     } catch (err: any) {
       const keyByErrors = keyBy(err?.errors, 'path.0')
       const errors = mapValues(keyByErrors, 'message')
