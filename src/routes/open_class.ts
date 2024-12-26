@@ -5,7 +5,7 @@ import keyBy from 'lodash/keyBy'
 import mapValues from 'lodash/mapValues'
 import { z } from 'zod'
 import fs from 'fs'
-import { getServer } from '@src/_helper/function'
+import { getServer, getUser } from '@src/_helper/function'
 const router = express.Router()
 
 const prisma = new PrismaClient({
@@ -150,11 +150,8 @@ router.get('/:id/detail', async (req: any, res: any) => {
 
     const mappedData: any = data
     if (data?.trainer_id) {
-      const trainer = await prisma.user.findUnique({ where: { id: data?.trainer_id } })
+      const trainer = await getUser(data?.trainer_id, req)
       mappedData.trainer = trainer
-      if (trainer?.id) {
-        mappedData.trainer.full_name = `${trainer?.first_name} ${trainer?.last_name}`
-      }
     }
     const transaction = await prisma.transaction_service.findMany({
       where: { class_schedule_id: data?.id, status: 2 },

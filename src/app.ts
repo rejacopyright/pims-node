@@ -14,6 +14,7 @@ import accountAPI from './routes/account'
 import authAPI from './routes/auth'
 import authAdminAPI from './routes/auth_admin'
 import globalAPI from './routes/global'
+import configAPI from './routes/config'
 import transactionAPI from './routes/transaction'
 import orderAPI from './routes/order'
 import classAPI from './routes/class'
@@ -47,6 +48,7 @@ app.use('/', indexRouter)
 app.use('/api/v1/auth', authAPI)
 app.use('/api/v1/auth/admin', authAdminAPI)
 app.use('/api/v1/global', globalAPI)
+app.use('/api/v1/config', AuthMiddleWare, configAPI)
 app.use('/api/v1/transaction', AuthMiddleWare, transactionAPI)
 app.use('/api/v1/order', AuthMiddleWare, orderAPI)
 app.use('/api/v1/users', AuthMiddleWare, usersAPI)
