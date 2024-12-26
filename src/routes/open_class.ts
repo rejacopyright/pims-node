@@ -100,11 +100,8 @@ router.get('/:service(studio|functional)', async (req: any, res: any) => {
         newItem.transaction = await Promise.all(
           transaction?.map(async (trx) => {
             const newTrx: any = trx
-            if (trx.user_id) {
-              newTrx.user = await prisma.user.findUnique({ where: { id: trx.user_id } })
-              newTrx.user.full_name = newTrx?.user?.first_name
-                ? `${newTrx?.user?.first_name} ${newTrx?.user?.last_name}`
-                : newTrx?.user?.username
+            if (trx?.user_id) {
+              newTrx.user = await getUser(trx?.user_id, req)
             }
             return newTrx
           })
@@ -159,18 +156,8 @@ router.get('/:id/detail', async (req: any, res: any) => {
     mappedData.transaction = await Promise.all(
       transaction?.map(async (trx) => {
         const newTrx: any = trx
-        if (trx.user_id) {
-          newTrx.user = await prisma.user.findUnique({ where: { id: trx.user_id } })
-          newTrx.user.full_name = newTrx?.user?.first_name
-            ? `${newTrx?.user?.first_name} ${newTrx?.user?.last_name}`
-            : newTrx?.user?.username
-
-          const avatar = `public/images/user/${newTrx.user?.avatar}`
-          const avatar_link =
-            newTrx.user?.avatar && fs.existsSync(avatar)
-              ? `${server}/static/images/user/${newTrx.user?.avatar}`
-              : null
-          newTrx.user.avatar_link = avatar_link
+        if (trx?.user_id) {
+          newTrx.user = await getUser(trx?.user_id, req)
         }
         return newTrx
       })

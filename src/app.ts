@@ -20,6 +20,7 @@ import orderAPI from './routes/order'
 import classAPI from './routes/class'
 import openClassAPI from './routes/open_class'
 import paymentAPI from './routes/payment'
+import trainerAPI from './routes/trainer'
 import memberPackageAPI from './routes/member_package'
 import memberItemsAPI from './routes/member_items'
 import memberTransactionAPI from './routes/member_transaction'
@@ -55,6 +56,7 @@ app.use('/api/v1/users', AuthMiddleWare, usersAPI)
 app.use('/api/v1/class/open', AuthMiddleWare, openClassAPI)
 app.use('/api/v1/class', AuthMiddleWare, classAPI)
 app.use('/api/v1/payment', AuthMiddleWare, paymentAPI)
+app.use('/api/v1/trainer', AuthMiddleWare, trainerAPI)
 app.use('/api/v1/member/package', AuthMiddleWare, memberPackageAPI)
 app.use('/api/v1/member/items', AuthMiddleWare, memberItemsAPI)
 app.use('/api/v1/member/transaction', AuthMiddleWare, memberTransactionAPI)
