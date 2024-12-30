@@ -1,0 +1,9 @@
+model app_banner {
+  id                   String         @id @default(uuid())
+  index                Int            @unique
+  image                String?
+  title                String?
+  sub_title            String?
+  created_at           DateTime       @default(now())
+  updated_at           DateTime       @updatedAt
+}

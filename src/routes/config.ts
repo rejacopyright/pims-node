@@ -3,6 +3,10 @@ import express from 'express'
 import keyBy from 'lodash/keyBy'
 import mapValues from 'lodash/mapValues'
 import has from 'lodash/has'
+import { z } from 'zod'
+import fs from 'fs'
+import moment from 'moment-timezone'
+import { getServer } from '@src/_helper/function'
 
 const router = express.Router()
 
@@ -12,6 +16,10 @@ const prisma = new PrismaClient({
       password: true,
     },
   },
+})
+
+export const CreateAppBannerValidator = z.object({
+  index: z.number({ required_error: 'Index is required' }).min(1, 'Index at least 1'),
 })
 
 // Get Detail Config
@@ -77,6 +85,164 @@ router.put('/update', async (req: any, res: any) => {
     return res
       .status(200)
       .json({ status: 'success', message: 'Configuration successfully updated', data })
+  } catch (err: any) {
+    const keyByErrors = keyBy(err?.errors, 'path.0')
+    const errors = mapValues(keyByErrors, 'message')
+    return res.status(400).json({ status: 'failed', message: errors })
+  }
+})
+
+// ======================== APP BANNER ========================
+
+// Get App Banner
+router.get('/app/banner', async (req: any, res: any) => {
+  const server = getServer(req)
+  try {
+    const data = await prisma.app_banner.findMany({ orderBy: { index: 'asc' } })
+    const mappedData = data?.map((item) => {
+      const newItem = item
+      const image = `public/images/app_banner/${item?.image}`
+      const image_link =
+        item?.image && fs.existsSync(image)
+          ? `${server}/static/images/app_banner/${item?.image}`
+          : null
+      newItem.image = image_link
+      return newItem
+    })
+    return res.status(200).json({ data: mappedData })
+  } catch (err: any) {
+    return res.status(400).json({ status: 'failed', message: err })
+  }
+})
+
+// Create App Banner
+router.post('/app/banner/create', async (req: any, res: any) => {
+  const { index, title, sub_title, image } = req?.body
+
+  try {
+    const checkDuplicateIndex = await prisma.app_banner.findUnique({ where: { index } })
+    if (checkDuplicateIndex) {
+      return res.status(400).json({ status: 'failed', message: `Index ${index} sudah ada` })
+    }
+
+    let filename
+    if (image) {
+      const dir = 'public/images/app_banner'
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir)
+      }
+      const base64 = image?.split(',')
+      const base64Ext = base64?.[0]?.toLowerCase()
+      const base64Data = base64?.[1]
+      let ext = 'png'
+      // var base64_buffer = Buffer.from(base64, 'base64')
+      if (base64Ext?.indexOf('jpeg') !== -1) {
+        ext = 'jpg'
+      }
+
+      filename = `${moment().format('YYYYMMDDHHmmss')}.${ext}`
+      fs.writeFile(`${dir}/${filename}`, base64Data, 'base64', () => '')
+    }
+
+    const data = await prisma.app_banner.create({
+      data: CreateAppBannerValidator.passthrough().parse({
+        index,
+        title,
+        sub_title,
+        image: filename,
+      }),
+    })
+
+    return res
+      .status(200)
+      .json({ status: 'success', message: 'App Banner successfully created', data })
+  } catch (err: any) {
+    const keyByErrors = keyBy(err?.errors, 'path.0')
+    const errors = mapValues(keyByErrors, 'message')
+    return res.status(400).json({ status: 'failed', message: errors })
+  }
+})
+
+// Update App Banner
+router.put('/app/banner/:id/update', async (req: any, res: any) => {
+  const { index, title, sub_title, image, isImageChanged } = req?.body
+  const { id } = req?.params
+
+  try {
+    const checkDuplicateIndex = await prisma.app_banner.findUnique({
+      where: { index, NOT: { id } },
+    })
+    if (checkDuplicateIndex) {
+      return res.status(400).json({ status: 'failed', message: `Index ${index} sudah ada` })
+    }
+
+    let filename
+    if (isImageChanged) {
+      const dir = 'public/images/app_banner'
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir)
+      }
+      const thisAppBanner = await prisma.app_banner.findUnique({ where: { id } })
+      if (thisAppBanner?.image) {
+        const filename = `${dir}/${thisAppBanner?.image}`
+        if (fs.existsSync(filename)) {
+          fs.unlink(filename, () => '')
+        }
+      }
+      if (image) {
+        const base64 = image?.split(',')
+        const base64Ext = base64?.[0]?.toLowerCase()
+        const base64Data = base64?.[1]
+        let ext = 'png'
+        // var base64_buffer = Buffer.from(base64, 'base64')
+        if (base64Ext?.indexOf('jpeg') !== -1) {
+          ext = 'jpg'
+        }
+
+        filename = `${moment().format('YYYYMMDDHHmmss')}.${ext}`
+        fs.writeFile(`${dir}/${filename}`, base64Data, 'base64', () => '')
+      } else {
+        filename = null
+      }
+    }
+
+    const data = await prisma.app_banner.update({
+      where: { id },
+      data: CreateAppBannerValidator.partial().passthrough().parse({
+        index,
+        title,
+        sub_title,
+        image: filename,
+      }),
+    })
+
+    return res
+      .status(200)
+      .json({ status: 'success', message: 'App Banner successfully changed', data })
+  } catch (err: any) {
+    const keyByErrors = keyBy(err?.errors, 'path.0')
+    const errors = mapValues(keyByErrors, 'message')
+    return res.status(400).json({ status: 'failed', message: errors })
+  }
+})
+
+// Delete App Banner
+router.delete('/app/banner/:id/delete', async (req: any, res: any) => {
+  const { id } = req?.params
+
+  try {
+    const dir = 'public/images/app_banner'
+    const thisAppBanner = await prisma.app_banner.findUnique({ where: { id } })
+    if (thisAppBanner?.image) {
+      const filename = `${dir}/${thisAppBanner?.image}`
+      if (fs.existsSync(filename)) {
+        fs.unlink(filename, () => '')
+      }
+    }
+    const data = await prisma.app_banner.delete({ where: { id } })
+    return res
+      .status(200)
+      .json({ status: 'success', message: 'App Banner successfully removed', data })
   } catch (err: any) {
     const keyByErrors = keyBy(err?.errors, 'path.0')
     const errors = mapValues(keyByErrors, 'message')

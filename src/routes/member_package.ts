@@ -91,6 +91,11 @@ router.post('/create', async (req: any, res: any) => {
   } = req?.body
 
   try {
+    const checkDuplicateLevel = await prisma.member_package.findUnique({ where: { level } })
+    if (checkDuplicateLevel) {
+      return res.status(400).json({ status: 'failed', message: `Level ${level} sudah ada` })
+    }
+
     let filename
     if (image) {
       const dir = 'public/images/member_package'
@@ -108,11 +113,6 @@ router.post('/create', async (req: any, res: any) => {
 
       filename = `${moment().format('YYYYMMDDHHmmss')}.${ext}`
       fs.writeFile(`${dir}/${filename}`, base64Data, 'base64', () => '')
-    }
-
-    const checkDuplicateLevel = await prisma.member_package.findUnique({ where: { level } })
-    if (checkDuplicateLevel) {
-      return res.status(400).json({ status: 'failed', message: `Level ${level} sudah ada` })
     }
 
     const data = await prisma.member_package.create({
@@ -172,6 +172,13 @@ router.put('/:id/update', async (req: any, res: any) => {
   const { id } = req?.params
 
   try {
+    const checkDuplicateLevel = await prisma.member_package.findUnique({
+      where: { level, NOT: { id } },
+    })
+    if (checkDuplicateLevel) {
+      return res.status(400).json({ status: 'failed', message: `Level ${level} sudah ada` })
+    }
+
     let filename
     if (isImageChanged) {
       const dir = 'public/images/member_package'
@@ -200,13 +207,6 @@ router.put('/:id/update', async (req: any, res: any) => {
       } else {
         filename = null
       }
-    }
-
-    const checkDuplicateLevel = await prisma.member_package.findUnique({
-      where: { level, NOT: { id } },
-    })
-    if (checkDuplicateLevel) {
-      return res.status(400).json({ status: 'failed', message: `Level ${level} sudah ada` })
     }
 
     const data = await prisma.member_package.update({
