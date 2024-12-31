@@ -113,6 +113,20 @@ router.get('/me', async (req: any, res: any) => {
     .json({ ...data, avatar_link, full_name, membership, member, pending_membership })
 })
 
+router.get('/profile', async (req: any, res: any) => {
+  const { user } = req
+  const data: any = {}
+  data.order = {}
+  data.order.unpaid_count = await prisma.transaction_service.count({
+    where: { user_id: user?.id, status: 1 },
+  })
+  data.order.active_count = await prisma.transaction_service.count({
+    where: { user_id: user?.id, status: 2 },
+  })
+
+  return res.status(200).json(data)
+})
+
 router.get('/voucher', async (req: any, res: any) => {
   const { user } = req
   const page = Number(req?.query?.page) || 1
