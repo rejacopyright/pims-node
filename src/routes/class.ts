@@ -3,7 +3,7 @@ import express from 'express'
 import moment from 'moment-timezone'
 import fs from 'fs'
 import { Encriptor } from '@src/_helper/encryptor'
-import { paginate, prismaX } from '@src/_helper/pagination'
+import { prismaX } from '@src/_helper/pagination'
 import keyBy from 'lodash/keyBy'
 import mapValues from 'lodash/mapValues'
 import { z } from 'zod'
@@ -134,6 +134,50 @@ router.get('/', async (req: any, res: any) => {
     )
     data.data = mappedData
     return res.status(200).json({ ...data })
+  } catch (err: any) {
+    return res.status(400).json({ status: 'failed', message: err })
+  }
+})
+
+// Get Top Class
+router.get('/top', async (req: any, res: any) => {
+  const server = getServer(req)
+  try {
+    const data = await prisma.class_store.findMany({
+      where: { NOT: { service_id: 1 } },
+      include: {
+        class_gallery: true,
+        _count: { select: { transaction_service: { where: { status: { in: [2, 3] } } } } },
+      },
+      orderBy: { transaction_service: { _count: 'desc' } },
+      take: 5,
+    })
+    const mappedData = await Promise.all(
+      data?.map(async (item) => {
+        const newItem: any = item
+        let image: any = null
+        if (item?.class_gallery?.length > 0) {
+          const imagePath = `public/images/class/${item?.class_gallery?.[0]?.filename}`
+          if (fs.existsSync(imagePath)) {
+            image = `${server}/static/images/class/${item?.class_gallery?.[0]?.filename}`
+          }
+          newItem.image = image
+        }
+
+        if (item?.service_id) {
+          newItem.service_name = (
+            await prisma.service.findUnique({ where: { id: item?.service_id } })
+          )?.name?.replace('Kelas ', '')
+        }
+
+        if (item?.default_trainer_id) {
+          newItem.default_trainer = await getUser(item?.default_trainer_id, req)
+        }
+
+        return newItem
+      })
+    )
+    return res.status(200).json({ data: mappedData })
   } catch (err: any) {
     return res.status(400).json({ status: 'failed', message: err })
   }

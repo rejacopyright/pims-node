@@ -12,6 +12,7 @@ model transaction_service {
   service_id              Int
   // If service is class (Studio / Functional) / service_id in [2,3]
   class_schedule_id       String?
+  class_store_id          String?
   purchase_expired        DateTime?
   purchased_at            DateTime?
   /// PLUS FEE
@@ -30,14 +31,17 @@ model transaction_service {
   valid_from              DateTime?
   valid_to                DateTime?
   /// 1[Unpaid] 2[Active] 3[Done] 4[Cancel]
-  status                  Int       @default(1)
+  status                  Int             @default(1)
   /// this.start_date.substract(config.cancel_booking_time, 'minutes') (When Activate/Purchase Order) [IF minutesOf(start_date - now) < cancel_booking_time]
   cancelable_until        DateTime?
   canceled_at             DateTime?
   /// 1[System] 2[User] 3[Trainer] 4[Admin]
   canceled_by             Int?
   cancel_reason           String?
-  created_at              DateTime  @default(now())
-  updated_at              DateTime  @updatedAt
+  created_at              DateTime        @default(now())
+  updated_at              DateTime        @updatedAt
   deleted                 DateTime?
+
+  class_schedule          class_schedule? @relation(fields: [class_schedule_id], references: [id], onDelete: NoAction)
+  class_store             class_store? @relation(fields: [class_store_id], references: [id], onDelete: NoAction)
 }

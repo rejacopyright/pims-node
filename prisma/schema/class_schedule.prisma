@@ -12,4 +12,5 @@ model class_schedule {
   end_date             DateTime?
 
   class                class_store?   @relation(fields: [class_id], references: [id], onDelete: SetNull)
+  transaction          transaction_service[]
 }

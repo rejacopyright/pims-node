@@ -13,6 +13,7 @@ model class_store {
   updated_at           DateTime   @updatedAt
   deleted              DateTime?
 
-  class_schedule       class_schedule[]
   class_gallery        class_gallery[]
+  class_schedule       class_schedule[]
+  transaction_service transaction_service[]
 }

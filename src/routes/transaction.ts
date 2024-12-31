@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client'
 import express from 'express'
 import moment from 'moment-timezone'
 import { Encriptor } from '@src/_helper/encryptor'
-import { coreApi, createTransaction, createTransactionType } from '@src/_helper/midtrans'
+import { createTransaction, createTransactionType } from '@src/_helper/midtrans'
 const router = express.Router()
 
 const prisma = new PrismaClient({
@@ -119,6 +119,7 @@ router.post('/class', async (req: any, res: any) => {
     const { user } = req
     const {
       class_schedule_id,
+      class_store_id,
       start_date,
       end_date,
       user_type,
@@ -188,6 +189,7 @@ router.post('/class', async (req: any, res: any) => {
           data: {
             order_no,
             class_schedule_id,
+            class_store_id,
             user_id,
             user_type,
             payment_id,
