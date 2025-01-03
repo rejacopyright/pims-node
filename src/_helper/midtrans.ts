@@ -58,9 +58,13 @@ export const createTransaction = async ({
         : payment_method?.deadline || 30,
       unit: custom_expiry?.unit ? custom_expiry?.unit : 'minute',
     },
-    metadata: {
-      type,
-    },
+    ...(!['shopee_pay', 'gopay'].includes(payment_id)
+      ? {
+          metadata: {
+            type,
+          },
+        }
+      : {}),
     customer_details: {
       first_name: user?.first_name || user?.username || '',
       last_name: !user?.first_name ? '' : user?.last_name || '',
@@ -113,6 +117,41 @@ export const createTransaction = async ({
       bank_transfer: {
         bank: 'permata',
         va_number: custom_va,
+      },
+      ...globalOptions,
+    }
+  } else if (['qris'].includes(payment_id)) {
+    params = {
+      payment_type: 'qris',
+      transaction_details: {
+        order_id: order_no,
+        gross_amount: requestBody?.total_fee,
+      },
+      qris: { acquirer: 'gopay' },
+      ...globalOptions,
+    }
+  } else if (['shopee_pay'].includes(payment_id)) {
+    params = {
+      payment_type: 'shopeepay',
+      transaction_details: {
+        order_id: order_no,
+        gross_amount: requestBody?.total_fee,
+      },
+      shopeepay: {
+        callback_url: 'https://pimsclub.id/',
+      },
+      ...globalOptions,
+    }
+  } else if (['gopay'].includes(payment_id)) {
+    params = {
+      payment_type: 'gopay',
+      transaction_details: {
+        order_id: order_no,
+        gross_amount: requestBody?.total_fee,
+      },
+      gopay: {
+        enable_callback: true,
+        callback_url: 'https://pimsclub.id/',
       },
       ...globalOptions,
     }

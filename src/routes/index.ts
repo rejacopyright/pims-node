@@ -12,7 +12,8 @@ router.get('/', async (req, res: any, next) => {
   const phoneStr = '085766666393'
   const phone = { sliced: phoneStr?.slice(-8), ln: phoneStr?.length }
   const encryptedUsername = Encriptor.encrypt('REJA', 'RJ')
-  return res.status(200).json({ oke: 'okelah7', test, phone, encryptedUsername })
+  const isVisit = 'VST250102172852-IQVM'.startsWith('VST')
+  return res.status(200).json({ oke: 'okelah7', test, phone, encryptedUsername, isVisit })
 })
 
 router.get('/religion', async (req, res: any, next) => {

@@ -17,6 +17,46 @@ const prisma = new PrismaClient({
   },
 })
 
+router.post('/link/gopay', async (req: any, res: any) => {
+  const { user }: any = req
+  const { id, phone } = req?.body || {}
+  try {
+    // const chargeResponse = await coreApi.charge({})
+    const params = {
+      payment_type: 'gopay',
+      gopay_partner: {
+        phone_number: phone?.toString(),
+        country_code: '62',
+        redirect_url: 'https://www.gojek.com',
+      },
+    }
+    const linkingAPI = await coreApi.linkPaymentAccount(params)
+    let data: any = null
+    if (user?.id && linkingAPI?.status_code === '201') {
+      const linkParams: any = {
+        user_id: user?.id,
+        type: 'gopay',
+        label: 'Gopay',
+        account: linkingAPI,
+        phone_number: phone?.toString(),
+      }
+      const isExist = await prisma.payment_account.findFirst({
+        where: { user_id: user?.id, type: 'gopay', status: 1 },
+      })
+      if (!isExist) {
+        data = await prisma.payment_account.create({ data: linkParams })
+      } else if (id) {
+        data = await prisma.payment_account.update({ where: { id }, data: linkParams })
+      }
+      return res.status(200).json({ status: 'success', data, account: linkingAPI })
+    } else {
+      return res.status(400).json({ status: 'failed', message: 'User not found' })
+    }
+  } catch (err) {
+    return res.status(400).json({ status: 'failed', message: err })
+  }
+})
+
 router.post('/charge', async (req: any, res: any) => {
   const { user } = req
   try {

@@ -1,0 +1,18 @@
+model payment_account {
+  id              String      @id @default(uuid())
+  user_id         String?
+  /// 1[Bank] 2[Wallet] 3[Counter] 4[Other]
+  type            String      @default("credit_card")
+  label           String?
+  account         Json?
+  phone_number    String?
+  // FOR Credit Card
+  card_number     String?
+  card_exp_month  String?
+  card_exp_year   String?
+  /// 0[Inactive] 1[Active]
+  status          Int         @default(0)
+  created_at      DateTime    @default(now())
+  updated_at      DateTime    @updatedAt
+  deleted         DateTime?
+}

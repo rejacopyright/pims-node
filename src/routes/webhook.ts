@@ -19,7 +19,7 @@ router.post('/midtrans/callback', async (req: any, res: any) => {
   const body = req.body
 
   try {
-    if (['order', 'visit'].includes(body?.metadata?.type)) {
+    if (['order', 'visit'].includes(body?.metadata?.type) || !body?.order_id?.startsWith('MB')) {
       const config = await prisma.config.findFirst()
       const thisTransaction = await prisma.transaction_service.findFirst({
         where: { order_no: body?.order_id },
@@ -61,7 +61,7 @@ router.post('/midtrans/callback', async (req: any, res: any) => {
       } else {
         return res.status(200).json({ status: body?.transaction_status })
       }
-    } else if (['member'].includes(body?.metadata?.type)) {
+    } else if (['member'].includes(body?.metadata?.type) || body?.order_id?.startsWith('MB')) {
       const purchased_at = moment(body?.settlement_time)
       const thisTransaction = await prisma.member_transaction.findFirst({
         where: { order_no: body?.order_id },
