@@ -24,6 +24,7 @@ import trainerAPI from './routes/trainer'
 import memberPackageAPI from './routes/member_package'
 import memberItemsAPI from './routes/member_items'
 import memberTransactionAPI from './routes/member_transaction'
+import bookingAPI from './routes/booking'
 import webhookAPI from './routes/webhook'
 import AuthMiddleWare from './middleware/auth'
 
@@ -61,6 +62,7 @@ app.use('/api/v1/trainer', AuthMiddleWare, trainerAPI)
 app.use('/api/v1/member/package', AuthMiddleWare, memberPackageAPI)
 app.use('/api/v1/member/items', AuthMiddleWare, memberItemsAPI)
 app.use('/api/v1/member/transaction', AuthMiddleWare, memberTransactionAPI)
+app.use('/api/v1/booking', AuthMiddleWare, bookingAPI)
 app.use('/api/v1/webhook', webhookAPI)
 app.use('/api/v1', AuthMiddleWare, accountAPI)
 

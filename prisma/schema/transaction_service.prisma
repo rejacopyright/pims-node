@@ -30,6 +30,7 @@ model transaction_service {
   /// QR TIME VALIDITY (IF ACTIVE)
   valid_from              DateTime?
   valid_to                DateTime?
+  scanned_at              DateTime?
   /// 1[Unpaid] 2[Active] 3[Done] 4[Cancel]
   status                  Int             @default(1)
   /// this.start_date.substract(config.cancel_booking_time, 'minutes') (When Activate/Purchase Order) [IF minutesOf(start_date - now) < cancel_booking_time]
