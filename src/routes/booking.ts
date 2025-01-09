@@ -29,7 +29,7 @@ router.get('/', async (req: any, res: any) => {
       page,
       limit,
       where: {
-        AND: [{ created_at: { gte } }, { created_at: { lt } }],
+        AND: [{ start_date: { gte } }, { start_date: { lt } }],
       },
       include: { class_store: { include: { class_gallery: true } }, class_schedule: true },
       orderBy: { updated_at: 'desc' },
