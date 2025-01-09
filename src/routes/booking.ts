@@ -107,4 +107,55 @@ router.delete('/:id/delete', async (req: any, res: any) => {
   }
 })
 
+// Check-in Transaction
+router.post('/:id/scan', async (req: any, res: any) => {
+  try {
+    const { id } = req?.params
+    const data = await prisma.transaction_service.findUnique({ where: { id, status: 2 } })
+    if (!data) {
+      return res.status(400).json({ status: 'failed', message: 'Data tidak ditemukan' })
+    }
+    if (moment(data?.valid_from).isAfter(moment())) {
+      return res.status(400).json({
+        status: 'failed',
+        message: `Transaksi tidak dapat diproses karena waktu check-in tidak memenuhi syarat.\n Check-in dapat dilakukan pada ${moment(data?.valid_from).format('dddd, D MMMM yyyy [pukul] HH:mm [WIB]')}`,
+      })
+    }
+    if (moment(data?.valid_to).isBefore(moment())) {
+      return res.status(400).json({
+        status: 'failed',
+        message: `Waktu check-in kadaluarsa.\n Check-in dapat dilakukan sampai ${moment(data?.valid_to).format('dddd, D MMMM yyyy [pukul] HH:mm [WIB]')}`,
+      })
+    }
+    if (Boolean(data?.scanned_at)) {
+      return res.status(400).json({
+        status: 'failed',
+        message: `Sudah check-in pada ${moment(data?.scanned_at).format('dddd, D MMMM yyyy [pukul] HH:mm [WIB]')}`,
+      })
+    }
+
+    const result = await prisma.transaction_service.update({
+      where: { id, status: 2 },
+      data: { scanned_at: moment().toISOString() },
+    })
+    return res.status(200).json({ status: 'success', data: result })
+  } catch (err: any) {
+    return res.status(400).json({ status: 'failed', message: err })
+  }
+})
+
+// Cancel Check-in Transaction
+router.post('/:id/scan/cancel', async (req: any, res: any) => {
+  try {
+    const { id } = req?.params
+    const result = await prisma.transaction_service.update({
+      where: { id, status: 2 },
+      data: { scanned_at: null },
+    })
+    return res.status(200).json({ status: 'success', data: result })
+  } catch (err: any) {
+    return res.status(400).json({ status: 'failed', message: err })
+  }
+})
+
 export default router

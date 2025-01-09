@@ -30,6 +30,7 @@ import AuthMiddleWare from './middleware/auth'
 
 const app = express()
 moment.tz.setDefault('Asia/Jakarta')
+moment.locale('id')
 
 // const corsOptions: CorsOptions = { origin: true, credentials: true, allowedHeaders: '*' }
 
