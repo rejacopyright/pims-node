@@ -374,10 +374,17 @@ router.delete('/:id/delete', async (req, res: any) => {
   // STORE USER
   prisma.$transaction(async () => {
     try {
-      const dir = 'public/images/user'
       const thisUser = await prisma.user.findUnique({ where: { id } })
       if (thisUser?.avatar) {
+        const dir = 'public/images/user'
         const filename = `${dir}/${thisUser?.avatar}`
+        if (fs.existsSync(filename)) {
+          fs.unlink(filename, () => '')
+        }
+      }
+      if (thisUser?.nik_file) {
+        const dir = 'public/images/nik'
+        const filename = `${dir}/${thisUser?.nik_file}`
         if (fs.existsSync(filename)) {
           fs.unlink(filename, () => '')
         }

@@ -172,7 +172,7 @@ router.get('/:id/detail', async (req: any, res: any) => {
 
 // Update Class
 router.put('/:id/update', async (req: any, res: any) => {
-  const { class_id, trainer_id, fee, quota, session } = req?.body
+  const { class_id, trainer_id, fee, quota, session, end_date } = req?.body
   const { id } = req?.params
 
   try {
@@ -184,6 +184,7 @@ router.put('/:id/update', async (req: any, res: any) => {
         fee: parseInt(fee || 0),
         quota: parseInt(quota || 0),
         session: parseInt(session || 1),
+        end_date,
       }),
     })
 

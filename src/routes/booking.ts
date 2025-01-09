@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import express from 'express'
-import { getServer, getUser } from '@src/_helper/function'
+import { getMember, getServer, getUser } from '@src/_helper/function'
 import { prismaX } from '@src/_helper/pagination'
 import fs from 'fs'
 import moment from 'moment-timezone'
@@ -67,8 +67,29 @@ router.get('/:id/detail', async (req: any, res: any) => {
   const server = getServer(req)
   try {
     const { id } = req?.params
-    const data = await prisma.transaction_service.findUnique({ where: { id } })
+    const data = await prisma.transaction_service.findUnique({
+      where: { id },
+      include: { class_store: { include: { class_gallery: true } }, class_schedule: true },
+    })
+    const services = await prisma.service.findMany({ select: { id: true, name: true } })
     const newData: any = data || {}
+    if (data?.user_id) {
+      newData.user = await getUser(data?.user_id, req)
+      const member = await getMember(data?.user_id, req)
+      newData.member = member?.member
+      newData.membership = member?.membership
+    }
+    if (data?.service_id) {
+      newData.service_name =
+        services?.find(({ id }) => id === data?.service_id)?.name || 'Gym Visit'
+    }
+    if (data?.class_store && data?.class_store?.class_gallery?.length > 0) {
+      const imageFileName = data?.class_store?.class_gallery?.[0]?.filename
+      const imagePath = `public/images/class/${imageFileName}`
+      if (fs.existsSync(imagePath)) {
+        newData.image = `${server}/static/images/class/${imageFileName}`
+      }
+    }
     return res.status(200).json(newData)
   } catch (err: any) {
     return res.status(400).json({ status: 'failed', message: err })

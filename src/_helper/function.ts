@@ -24,12 +24,20 @@ export const getUser = async (id: string, req) => {
         user.full_name = user?.first_name
           ? `${user?.first_name} ${user?.last_name || ''}`
           : user?.username
+        // Avatar
         const avatar = `public/images/user/${user?.avatar}`
         const avatar_link =
           user?.avatar && fs.existsSync(avatar)
             ? `${server}/static/images/user/${user?.avatar}`
             : null
         user.avatar_link = avatar_link
+        // NIK
+        const nik_file = `public/images/nik/${user?.nik_file}`
+        const nik_link =
+          user?.nik_file && fs.existsSync(nik_file)
+            ? `${server}/static/images/nik/${user?.nik_file}`
+            : null
+        user.nik_link = nik_link
       } else {
         user = null
       }
@@ -38,4 +46,34 @@ export const getUser = async (id: string, req) => {
     }
   }
   return user
+}
+
+export const getMember = async (id: string, req) => {
+  const server = getServer(req)
+  let result: any = null
+  if (id) {
+    result = {}
+    try {
+      // MEMBERSHIP
+      let member: any = null
+      const membership = await prisma.member_transaction.findFirst({
+        where: { user_id: id, status: 2 },
+      })
+      if (membership?.member_id) {
+        member = await prisma.member_package.findFirst({
+          where: { id: membership?.member_id },
+        })
+      }
+      if (member?.badge) {
+        member.badge = fs.existsSync(`public/images/member_package/${member?.badge}`)
+          ? `${server}/static/images/member_package/${member?.badge}`
+          : null
+      }
+      result.membership = membership
+      result.member = member
+    } catch (error) {
+      result = null
+    }
+  }
+  return result
 }
