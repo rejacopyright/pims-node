@@ -273,7 +273,7 @@ router.post('/update/profile', async (req: any, res: any) => {
 
   try {
     const isExist = await prisma.user.findFirst({ where: { nik, NOT: { id: user?.id } } })
-    if (isExist) {
+    if (nik && isExist) {
       return res.status(400).json({ status: 'failed', message: 'NIK sudah terdaftar' })
     }
     const data = await prisma.user.update({
