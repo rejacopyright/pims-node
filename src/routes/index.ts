@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { Encriptor } from '@src/_helper/encryptor'
-import { paginate, prismaX } from '@src/_helper/pagination'
+import { prismaX } from '@src/_helper/pagination'
 import express from 'express'
 import moment from 'moment-timezone'
 const router = express.Router()
@@ -17,13 +17,13 @@ router.get('/', async (req, res: any, next) => {
 })
 
 router.get('/religion', async (req, res: any, next) => {
-  const data = await prismaX.religion.paginate({ page: 1, limit: 100 })
-  return res.status(200).json(data)
+  const data = await prisma.religion.findMany()
+  return res.status(200).json({ data })
 })
 
 router.get('/occupation', async (req, res: any, next) => {
-  const data = await prismaX.occupation.paginate({ page: 1, limit: 100 })
-  return res.status(200).json(data)
+  const data = await prisma.occupation.findMany()
+  return res.status(200).json({ data })
 })
 
 router.get('/province', async (req, res: any, next) => {
