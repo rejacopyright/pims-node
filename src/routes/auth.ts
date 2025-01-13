@@ -110,17 +110,17 @@ router.post('/register', async (req, res: any) => {
       const user = await prisma.user.create({
         data: { username, email, phone, password: await bcrypt.hash(password, 10) },
       })
-      await prisma.voucher.create({
-        data: {
-          user_id: user?.id,
-          code: 'NEWUSER',
-          type: voucher_new_user_type,
-          value: voucher_new_user_value,
-          name: 'Pengguna Baru',
-          title: 'Voucher transaksi pertama',
-          expired_at: moment().add(1, 'months').toISOString(),
-        },
-      })
+      // await prisma.voucher.create({
+      //   data: {
+      //     user_id: user?.id,
+      //     code: 'NEWUSER',
+      //     type: voucher_new_user_type,
+      //     value: voucher_new_user_value,
+      //     name: 'Pengguna Baru',
+      //     title: 'Voucher transaksi pertama',
+      //     expired_at: moment().add(1, 'months').toISOString(),
+      //   },
+      // })
     } catch (err: any) {
       const keyByErrors = keyBy(err?.errors, 'path.0')
       const errors = mapValues(keyByErrors, 'message')
@@ -140,7 +140,7 @@ router.post('/register', async (req, res: any) => {
       html,
     })
   })
-  return res.status(200).json({ status: 'success', message: 'Daftar Berhasil' })
+  return res.status(200).json({ status: 'success', message: 'Pendaftaran Berhasil' })
 })
 
 router.post('/token/refresh', AuthMiddleWare, async (req, res: any) => {

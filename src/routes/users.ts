@@ -368,38 +368,57 @@ router.post('/:id/move/:role(regular|trainer|member)', async (req, res: any) => 
   })
 })
 
+const deleteUserFn = async (id) => {
+  try {
+    const thisUser = await prisma.user.findUnique({ where: { id } })
+    if (thisUser?.avatar) {
+      const dir = 'public/images/user'
+      const filename = `${dir}/${thisUser?.avatar}`
+      if (fs.existsSync(filename)) {
+        fs.unlink(filename, () => '')
+      }
+    }
+    if (thisUser?.nik_file) {
+      const dir = 'public/images/nik'
+      const filename = `${dir}/${thisUser?.nik_file}`
+      if (fs.existsSync(filename)) {
+        fs.unlink(filename, () => '')
+      }
+    }
+
+    await prisma.voucher.deleteMany({ where: { user_id: id } })
+    // await prisma.transaction_service.deleteMany({ where: { user_id: id } })
+    // await prisma.member_transaction.deleteMany({ where: { user_id: id } })
+
+    const data = await prisma.user.delete({ where: { id } })
+    return data
+  } catch (err: any) {
+    return err
+  }
+}
 router.delete('/:id/delete', async (req, res: any) => {
   const { id } = req?.params
 
   // STORE USER
   prisma.$transaction(async () => {
     try {
-      const thisUser = await prisma.user.findUnique({ where: { id } })
-      if (thisUser?.avatar) {
-        const dir = 'public/images/user'
-        const filename = `${dir}/${thisUser?.avatar}`
-        if (fs.existsSync(filename)) {
-          fs.unlink(filename, () => '')
-        }
-      }
-      if (thisUser?.nik_file) {
-        const dir = 'public/images/nik'
-        const filename = `${dir}/${thisUser?.nik_file}`
-        if (fs.existsSync(filename)) {
-          fs.unlink(filename, () => '')
-        }
-      }
-
-      await prisma.voucher.deleteMany({ where: { user_id: id } })
-      // await prisma.transaction_service.deleteMany({ where: { user_id: id } })
-      // await prisma.member_transaction.deleteMany({ where: { user_id: id } })
-
-      const data = await prisma.user.delete({ where: { id } })
+      const data = await deleteUserFn(id)
       return res.status(200).json({ status: 'success', message: 'User successfully removed', data })
-    } catch (err: any) {
-      const keyByErrors = keyBy(err?.errors, 'path.0')
-      const errors = mapValues(keyByErrors, 'message')
-      return res.status(400).json({ status: 'failed', message: errors })
+    } catch (err) {
+      return res.status(400).json({ status: 'failed', message: err })
+    }
+  })
+})
+router.delete('/delete/self', async (req: any, res: any) => {
+  const { id } = req?.user
+
+  // STORE USER
+  prisma.$transaction(async () => {
+    try {
+      const data = await deleteUserFn(id)
+      return res.status(200).json({ status: 'success', message: 'User successfully removed', data })
+    } catch (err) {
+      return res.status(400).json({ status: 'failed', message: err })
     }
   })
 })
